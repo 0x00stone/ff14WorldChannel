@@ -38,17 +38,11 @@
     <Reference Include="Advanced Combat Tracker">
       <HintPath>H:\ff14\ACT\Advanced Combat Tracker.dll</HintPath>
     </Reference>
-    <Reference Include="Costura, Version=5.7.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Costura.Fody.5.7.0\lib\netstandard1.0\Costura.dll</HintPath>
-    </Reference>
     <Reference Include="FFXIV_ACT_Plugin">
       <HintPath>.\FFXIV_ACT_Plugin.dll</HintPath>
     </Reference>
     <Reference Include="ffxiv_act_plugin.common">
       <HintPath>.\ffxiv_act_plugin.common.dll</HintPath>
-    </Reference>
-    <Reference Include="GreyMagic">
-      <HintPath>..\FF14Chat_cli\Costura64\GreyMagic.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Win32.Primitives.4.3.0\lib\net46\Microsoft.Win32.Primitives.dll</HintPath>
@@ -96,11 +90,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.IO.Compression.ZipFile, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>packages\System.IO.Compression.ZipFile.4.3.0\lib\net46\System.IO.Compression.ZipFile.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.IO.FileSystem, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.IO.FileSystem.4.3.0\lib\net46\System.IO.FileSystem.dll</HintPath>
       <Private>True</Private>
@@ -196,15 +185,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\Command.cs" />
-    <Compile Include="Actions\Inject.cs" />
+    <Compile Include="Network\Command.cs" />
     <Compile Include="Actions\Service.cs" />
-    <Compile Include="Actions\Update.cs" />
+    <Compile Include="Network\Update.cs" />
     <Compile Include="Common\Log.cs" />
-    <Compile Include="Common\MemHelper.cs" />
-    <Compile Include="Common\SigScanner.cs" />
-    <Compile Include="Common\SizeCache.cs" />
-    <Compile Include="Common\SwitchParser.cs" />
     <Compile Include="Models\ChannelItem.cs" />
     <Compile Include="Models\LoginUser.cs" />
     <Compile Include="Models\UserItem.cs" />
@@ -220,7 +204,7 @@
     <Compile Include="Controls\LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Common\NetworkUtil.cs" />
+    <Compile Include="Network\NetworkUtil.cs" />
     <Compile Include="Controls\RegisterForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -230,20 +214,12 @@
     <Compile Include="Common\SerializeUtil.cs" />
     <Compile Include="Common\XmlUtils.cs" />
     <Compile Include="Models\MsgItem.cs" />
-    <Compile Include="Models\Player.cs" />
     <Compile Include="Models\Result.cs" />
     <Compile Include="UserApplication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Costura64\GreyMagic.dll" />
-    <Content Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="FodyWeavers.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

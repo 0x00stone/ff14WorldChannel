@@ -1,42 +1,59 @@
 ﻿
-using Advanced_Combat_Tracker;
 using FF14Chat.Common;
+using FF14Chat.Controls;
 using FF14Chat.Models;
-using Newtonsoft.Json;
+using FF14Chat_c.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FF14Chat.Controls {
+namespace FF14Chat.Network {
 	public class NetworkUtil {
 		private static HttpClient httpClient;
 
-		private static string getServerAddress = "/ff14chat/server/v1/serverList";
-		private static string userRegisterAddress = "/ff14chat/user/v1/register";
-		private static string userLoginAddress = "/ff14chat/user/v1/login";
-		private static string getUsersAddress = "/ff14chat/user/v1/getLoginUser/";
-		private static string msgAddress = "/ff14chat/msg/v1/";
-		private static string postheartbeatAddress = "/ff14chat/user/v1/heartbeat";
-		private static string reportMessageAddress = "/ff14chat/msg/v1/reportMsg";
-		private static string getVersionAddress = "/ff14chat/system/v1/getVersion";
-		private static string getDllAddress = "/FF14Chat-c.dll";
+		private static string getServerAddress = "http://101.43.27.147/ff14chat/server/v1/serverList";
+		private static string userRegisterAddress = "http://101.43.27.147/ff14chat/user/v1/register";
+		private static string userLoginAddress = "http://101.43.27.147/ff14chat/user/v1/login";
+		private static string getUsersAddress = "http://101.43.27.147/ff14chat/user/v1/getLoginUser/";
+		private static string msgAddress = "http://101.43.27.147/ff14chat/msg/v1/";
+		private static string postheartbeatAddress = "http://101.43.27.147/ff14chat/user/v1/heartbeat";
+		private static string reportMessageAddress = "http://101.43.27.147/ff14chat/msg/v1/reportMsg";
+		private static string getVersionAddress = "http://101.43.27.147/ff14chat/system/v1/getVersion";
+		private static string getDllAddress = "http://101.43.27.147/FF14Chat-c.dll";
+		private static string postNamazuAddress = "http://127.0.0.1:1002/command";
 
-		public static void setURL(string url) {
-			getServerAddress = url + getServerAddress;
-			userRegisterAddress = url + userRegisterAddress;
-			userLoginAddress = url + userLoginAddress;
-			getUsersAddress = url + getUsersAddress;
-			msgAddress = url + msgAddress;
-			postheartbeatAddress = url + postheartbeatAddress;
-			reportMessageAddress = url + reportMessageAddress;
-			getVersionAddress = url + getVersionAddress;
-			getDllAddress = url + getDllAddress;
+
+		public static async Task<LoginUserResult> loginUser(LoginUser loginUser) {
+			if(loginUser.Name.Length >= 10) {
+				MessageBox.Show("用户名称大于10个字符", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return null;
+			}
+			if(System.Text.RegularExpressions.Regex.IsMatch(loginUser.Name, @"[^a-zA-Z0-9_\-\u4e00-\u9fa5]")) {
+				MessageBox.Show("用户名只可以使用字母，数字，中文和_-", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return null;
+			}
+			if(loginUser.Name == null || "".Equals(loginUser.Name) || loginUser.Password == null || "".Equals(loginUser.Password)) {
+				MessageBox.Show("用户名或密码为空", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return null;
+			}
+			if("".Equals(loginUser.ServerId) || loginUser.ServerId == null ) {
+				MessageBox.Show("未选择服务器", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return null;
+			}
+
+			var jsonObject = new {
+				aliasName = loginUser.Name.Trim(),
+				password = loginUser.Password.Trim().GetHashCode(),
+				serverId = loginUser.ServerId.Trim()
+			};
+			string json = SerializeUtil.ToJson(jsonObject);
+
+			return await NetworkUtil.Login(json);
 		}
 
 		public static async Task<bool> downloadDll() {
@@ -117,8 +134,6 @@ namespace FF14Chat.Controls {
 			}
 		}
 
-
-
 		public static async Task<LoginUserResult> Login(string json) {
 			string responseData = await NetworkUtil.SendPostRequest(userLoginAddress, json);
 
@@ -130,9 +145,21 @@ namespace FF14Chat.Controls {
 			dynamic responseJson = JObject.Parse(responseData);
 			LoginUserResult result = new LoginUserResult("", "", "", "");
 
-			if(200 == ((int)responseJson["code"])) {
+			if(200 == ((int)responseJson["code"]) && responseJson["data"]!=null) {
+				dynamic payload = JObject.Parse((string)responseJson["data"]);
+				Log.info("LoginResponse: " + (string)responseJson["data"]);
+
+				ulong contentId = ulong.Parse((string)payload["contentId"]);
+				Log.info(contentId+"");
+				if(FF14Chat_Main.playerContent!=0 && contentId != FF14Chat_Main.playerContent) { 
+					//TODO:
+					//1. 尝试切换用户
+				}
+
+				result.setToken((string)payload["token"]);
+				result.setContent((string)payload["contentId"]);
+
 				MessageBox.Show("登录成功", "登录提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				result.setToken((string)responseJson["data"]);
 			} else {
 				string message = null;
 				if(responseJson != null) {
@@ -152,7 +179,6 @@ namespace FF14Chat.Controls {
 		}
 
 
-
 		public static async Task<LoginUserResult> Heartbeat(LoginUserResult result) {
 			string responseData = await NetworkUtil.SendHeartbeat(postheartbeatAddress, result.getToken());
 
@@ -165,7 +191,18 @@ namespace FF14Chat.Controls {
 			dynamic responseJson = JObject.Parse(responseData);
 
 			if(200 == ((int)responseJson["code"])) {
-				result.setToken((string)responseJson["data"]);
+				dynamic payload = JObject.Parse((string)responseJson["data"]);
+				Log.debug("LoginResponse: " + (string)responseJson["data"]);
+
+				ulong contentId = ulong.Parse((string)payload["contentId"]);
+				Log.debug(contentId + "");
+				if(FF14Chat_Main.playerContent != 0 && contentId != FF14Chat_Main.playerContent) {
+					//TODO:
+					//1. 尝试切换用户
+				}
+
+				result.setToken((string)payload["token"]);
+				result.setContent((string)payload["contentId"]);
 			} else if(401 == ((int)responseJson["code"])) {
 
 				var jsonObject = new {
@@ -199,15 +236,15 @@ namespace FF14Chat.Controls {
 		private static string timestamp = "";
 
 		public static async Task<string> GetUsersByStock(LoginUserResult result) {
+			string userResponse = await NetworkUtil.SendGetRequest(getUsersAddress + result.getServerId()+"/0");
 			timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-			string userResponse = await NetworkUtil.SendGetRequest(getUsersAddress + result.getServerId());
 			return userResponse;
 		}
 
 		public static async Task<string> GetUsersByIncrement(LoginUserResult result) {
 			string userResponse = await NetworkUtil.SendGetRequest(getUsersAddress + result.getServerId() + "/" + timestamp);
 			timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-			Log.info("GetUsersByIncrement ,time" + timestamp);
+			Log.info("GetUsersByIncrement ,time：" + timestamp);
 			return userResponse;
 		}
 
@@ -278,9 +315,14 @@ namespace FF14Chat.Controls {
 			return text;
 		}
 
+		public static async void sendToPostNamazu(string s) {
+			NetworkUtil.SendPostRequest(postNamazuAddress, s);
+		}
+
 		public static async Task<string> SendGetRequest(string url) {
 			if(httpClient == null)
 				httpClient = new HttpClient();
+			Log.debug($"SendGetRequest - url:{url}");
 			try {
 				HttpResponseMessage response = await httpClient.GetAsync(url);
 				response.EnsureSuccessStatusCode();
@@ -289,12 +331,17 @@ namespace FF14Chat.Controls {
 
 				return responseData;
 			} catch(Exception ex) {
+				Log.error($"SendGetRequest: {ex.Message}");
 				return null;
 			}
 		}
+
+
+
 		public static async Task<string> SendPostRequest(string url, string requestBody) {
 			if(httpClient == null)
 				httpClient = new HttpClient();
+			Log.debug($"SendPostRequest - url:{url} - requestBody{requestBody}");
 			try {
 				StringContent content = new StringContent(requestBody, Encoding.UTF8, "application/json");
 
@@ -305,6 +352,7 @@ namespace FF14Chat.Controls {
 
 				return responseData;
 			} catch(Exception ex) {
+				Log.error($"SendPostRequest: { ex.Message}");
 				return null;
 			}
 		}
@@ -312,7 +360,7 @@ namespace FF14Chat.Controls {
 		public static async Task<string> SendHeartbeat(string url,string token) {
 			if(httpClient == null)
 				httpClient = new HttpClient();
-
+			Log.debug($"SendHeartbeat - url:{url} - token:{token}");
 			httpClient.DefaultRequestHeaders.Add("token", token);
 			string responseData = null;
 
@@ -325,7 +373,7 @@ namespace FF14Chat.Controls {
 
 				
 			} catch(Exception ex) {
-				
+				Log.error($"SendHeartbeat: {ex.ToString()}");
 			}
 			httpClient.DefaultRequestHeaders.Remove("token");
 			return responseData;
@@ -334,6 +382,7 @@ namespace FF14Chat.Controls {
 		public static async Task<string> SendMessageRequest(string url,string token, string requestBody) {
 			if(httpClient == null)
 				httpClient = new HttpClient();
+			Log.debug($"SendMessageRequest - url:{url} - token:{token} - requestBody{requestBody}");
 			string responseData="";
 			try {
 				httpClient.DefaultRequestHeaders.Add("token", token);
@@ -349,7 +398,6 @@ namespace FF14Chat.Controls {
 			} 
 			httpClient.DefaultRequestHeaders.Remove("token");
 			return responseData;
-
 		}
 	}
 }

@@ -1,21 +1,15 @@
 ﻿
-using FF14Chat.Models;
-using FF14Chat.Controls;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using FF14Chat.Common;
+using FF14Chat.Network;
 
 namespace FF14Chat.Controls {
 	public partial class RegisterForm : Form {
 
 		private Dictionary<string, Dictionary<string, string>> resultMap;
-
-		private string playerName;
-		private Player player;
 
 		public RegisterForm() {
 			InitializeComponent();
@@ -82,7 +76,7 @@ namespace FF14Chat.Controls {
 				MessageBox.Show("两次密码不相同！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
-			if(ReferenceEquals(player, null) || playerName==null) {
+			if(FF14Chat_Main.playerContent != 0) {
 				MessageBox.Show("请先登录游戏角色再注册账号", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
@@ -102,23 +96,12 @@ namespace FF14Chat.Controls {
 				MessageBox.Show("未选择服务器", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
-			if(player.ObjectId == 0  || player.ContentId == 0 ||player.Tribe == 0 ||player.Sex == 0 || player.StartTown == 0 ||player.BirthMonth == 0 || player.BirthDay == 0 ||player.GuardianDeity == 0) {
-				MessageBox.Show("请先登录游戏角色再注册账号", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
 
 			var jsonObject = new {
 				aliasName = username.Trim(),
 				password = password1.Trim().GetHashCode(),
 				serverId = resultMap[partition][server],
-				contentId = player.ContentId,
-				name = playerName.Trim(' '),
-				tribe = player.Tribe,
-				sex = player.Sex,
-				startTown = player.StartTown,
-				birthMonth = player.BirthMonth,
-				birthDay = player.BirthDay,
-				guardianDeity = player.GuardianDeity,
+				contentId = FF14Chat_Main.playerContent
 			};
 
 			NetworkUtil.register(SerializeUtil.ToJson(jsonObject));
@@ -128,11 +111,5 @@ namespace FF14Chat.Controls {
 		private void cancelButton_Click(object sender, EventArgs e) {
 			this.Close();
 		}
-
-		public void setPlayer(String playername, Player player) { 
-			this.playerName = playername;
-			this.player = player;
-		}
-		//TODO: 
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 
 namespace FF14Chat.Models {
 	public class LoginUserResult {
@@ -6,6 +6,7 @@ namespace FF14Chat.Models {
 		private string serverId;
 		private string aliasname;
 		private string password;
+		private string content;
 
 		public LoginUserResult(string serverId, string token, string aliasname, string password) {
 			this.token = token;
@@ -13,6 +14,15 @@ namespace FF14Chat.Models {
 			this.aliasname = aliasname;
 			this.password = password;
 		}
+
+		public void setContent(string content) {
+			this.content = content;
+		}
+
+		public string getcontent() {
+			return this.content;
+		}
+
 
 		public string getServerId() {
 			return this.serverId;
@@ -44,5 +54,7 @@ namespace FF14Chat.Models {
 		public void setPassword(string password) {
 			this.password = password;
 		}
+
+
 	}
 }

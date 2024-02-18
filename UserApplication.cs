@@ -9,33 +9,35 @@ using FF14Chat.Common;
 using FF14Chat.Actions;
 using System.Collections.Generic;
 using System;
+using FF14Chat.Network;
 
 namespace FF14Chat {
 	public class FF14Chat_Main : IActPluginV1 {
 
 		private System.Windows.Forms.Label _lblStatus;
 
-		private Inject inject;
 		private FF14ChatUi PluginUI;
 		private Service service;
 
-		private Player player;
-		private string playerName="";
 		public static LoginUserResult loginUserResult;
 
-		private BackgroundWorker _injectProcessSwitcher;
 		private BackgroundWorker _ServiceProcessSwitcher;
+		private BackgroundWorker _clientProcessSwitcher;
 
-		public static bool isReady = false;
-		public static bool isLogin = false;
+		public static bool isGameOn = false; //游戏是否打开
+		public static bool isLogin = false; //聊天账户是否登录
+		public static bool isRunning = true; //插件是否运行
+
 		public static HashSet<String> allowWord;
 		public static HashSet<String> notAllowWord;
 		public static List<String> userBlanklist; //存userID
 		public static List<UserItem> userList;
 		public static string[] bindBucket;
+		public static bool[] bindIsOpen = { true, true, true };
 		// 0 : "0010"
 		// 1 : "0015"
 		// 2 : "0017"
+		private Command command;
 
 
 		#region init/de
@@ -43,16 +45,7 @@ namespace FF14Chat {
 			pluginScreenSpace.Text = "世界频道";
 			_lblStatus = pluginStatusText;
 
-			init(pluginScreenSpace);
-		}
-
-		public void DeInitPlugin() {
-			isReady = false;
-			detch();
-			_lblStatus.Text = "世界频道停止 ";
-		}
-
-		public void init(TabPage pluginScreenSpace) {
+			command = new Command();
 			allowWord = new HashSet<String>();
 			notAllowWord = new HashSet<String>();
 			userBlanklist = new List<String>();
@@ -60,29 +53,23 @@ namespace FF14Chat {
 			bindBucket = new string[] { "0000", "0000", "0000" };
 
 			Log.init();
-			inject = new Inject(this);
 			PluginUI = new FF14ChatUi(this);
 			service = new Service(this);
 			pluginScreenSpace.Controls.Add(PluginUI);
 
+
+			_clientProcessSwitcher = new BackgroundWorker { WorkerSupportsCancellation = true };
+			_clientProcessSwitcher.DoWork += service.ProcessSwitcher;
+			_clientProcessSwitcher.RunWorkerAsync();
+
 			_lblStatus.Text = "世界频道启动 :D";
-
-			startInjectProcess();
 		}
 
-		public void detch() {
+		public void DeInitPlugin() {
+			isRunning = false;
 			//ActGlobals.oFormActMain.OnLogLineRead -= PluginUI.oFormActMain_OnLogLineRead;
-			_injectProcessSwitcher?.CancelAsync();
-			_ServiceProcessSwitcher?.CancelAsync();
-			inject?.gameDetach();
 			Log.Shutdown();
-		}
-		#endregion
-
-		private void startInjectProcess() {
-			_injectProcessSwitcher = new BackgroundWorker { WorkerSupportsCancellation = true };
-			_injectProcessSwitcher.DoWork += inject.ProcessSwitcher;
-			_injectProcessSwitcher.RunWorkerAsync();
+			_lblStatus.Text = "世界频道停止 ";
 		}
 
 		public void startServiceProcess() {
@@ -95,16 +82,10 @@ namespace FF14Chat {
 			// 订阅 ChatLogReceived 事件
 			ActGlobals.oFormActMain.OnLogLineRead += service.oFormActMain_OnLogLineRead;
 		}
+		#endregion
 
 
 		#region getter/setter
-		public BackgroundWorker getInjectProcessSwitcher() {
-			return _injectProcessSwitcher;
-		}
-
-		public BackgroundWorker getServiceProcessSwitcher() {
-			return _ServiceProcessSwitcher;
-		}
 
 
 		public void setLabelFFXIVPluginStatusRun() {
@@ -115,26 +96,18 @@ namespace FF14Chat {
 			PluginUI.setLabelGameProcessStatus(processNum);
 		}
 
-		public void setPlayer(Player player) {
-			this.player = player;
-		}
+		public static ulong playerContent = 0;
 
-		public void setPlayerName(string playerName) {
-			if(!"".Equals(this.playerName) && !this.playerName.Equals(playerName)) {
-				Log.info("当前由" + this.playerName + "切换用户为" + playerName);
+		public void setPlayerContent(ulong playerContent) {
+			if((FF14Chat_Main.playerContent != 0) && (FF14Chat_Main.playerContent != playerContent)) {
+				//change player
+				Log.info("当前由 " + FF14Chat_Main.playerContent + "切换用户为" + playerContent);
 				//TODO: 切换用户 
 			}
-			this.playerName = playerName;
 
-			PluginUI.setLabelLoginStatus(playerName);
+			FF14Chat_Main.playerContent = playerContent;
 
-			if(PluginUI.registerForm != null) {
-				PluginUI.registerForm.setPlayer(playerName, player);
-			}
-		}
-
-		public void setCommand(Command command) {
-			PluginUI.SetCommand(command);
+			PluginUI.setLabelLoginStatus(playerContent +"");
 		}
 
 		public void addMessage(string message) {
@@ -173,15 +146,13 @@ namespace FF14Chat {
 			service.reportMessage(msgID);
 		}
 
-		public void autoLogin() {
-			PluginUI.autoLoginAsync();
+		public void autoLogin(ulong contentID) {
+			PluginUI.autoLoginAsync(contentID);
 		}
-
-
 
 		#endregion
 	}
 }
 //TODO
-//修改为无注入
-//自动登录完善
+//用户列表
+//login时间特别长

@@ -1,19 +1,14 @@
-﻿using Advanced_Combat_Tracker;
-using FF14Chat;
+﻿
 using FF14Chat.Common;
-using FF14Chat.Controls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FF14Chat_c.Actions {
+namespace FF14Chat.Network {
 	public class Update {
 
-		public async void getNewVersionAsync(FF14Chat_Main main) {
+		public async void getNewVersionAsync() {
 			Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
 			Version latestVersion = await GetLatestVersionAsync();
 

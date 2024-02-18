@@ -1,27 +1,19 @@
 ﻿
-using FF14Chat.Actions;
+
 using FF14Chat.Common;
 using FF14Chat.Models;
-using FF14Chat_c.Actions;
+using FF14Chat.Network;
 using FF14Chat_c.Models;
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace FF14Chat.Controls {
 	public partial class FF14ChatUi : UserControl {
 
-		private Command command;
 		private FF14Chat_Main main;
-
-		public void SetCommand(Command command) {
-			this.command = command;
-		}
 
 		public FF14ChatUi(FF14Chat_Main main) {
 			this.main = main;
@@ -31,7 +23,7 @@ namespace FF14Chat.Controls {
 			XmlUtils.LoadSysSettings(this);
 
 			addMessage($"当前插件版本为:{Assembly.GetExecutingAssembly().GetName().Version}");
-			new Update().getNewVersionAsync(main);
+			new Update().getNewVersionAsync();
 		}
 
 		#region Menu
@@ -416,6 +408,7 @@ namespace FF14Chat.Controls {
 			dataGridMessage1Add($"[{DateTime.Now:HH:mm:ss}]", message);
 			dataGridMessage2Add($"[{DateTime.Now:HH:mm:ss}]", message);
 			dataGridMessage3Add($"[{DateTime.Now:HH:mm:ss}]", message);
+			Command.DoTextCommand($"/e [系统消息] : {message}");
 		}
 
 		//系统消息
@@ -465,9 +458,9 @@ namespace FF14Chat.Controls {
 
 			if(scroll1)
 				dataGridMessage1.FirstDisplayedScrollingRowIndex = dataGridMessage1.Rows.Count - 1;
-			if(!"0000".Equals(FF14Chat_Main.bindBucket[0])) {
-				//command?.DoTextCommand("/l" + (int.Parse(FF14Chat_Main.bindBucket[0]) - 9) + msgItem);
-				command?.DoTextCommand("/l" + (int.Parse(FF14Chat_Main.bindBucket[0]) - 9) +  " [区域频道]" + msgItem.Username+" : "+msgItem);
+
+			if(!"0000".Equals(FF14Chat_Main.bindBucket[0]) && msgItem.UserId != 0) {
+				Command.DoTextCommand($"/e [区域频道] {msgItem.Username} : {msgItem.message}");
 			}
 		}
 		public void dataGridMessage2Add(MsgItem msgItem) {
@@ -489,8 +482,8 @@ namespace FF14Chat.Controls {
 
 			if(scroll2)
 				dataGridMessage2.FirstDisplayedScrollingRowIndex = dataGridMessage2.Rows.Count - 1;
-			if(!"0000".Equals(FF14Chat_Main.bindBucket[1])) {
-				command?.DoTextCommand($"/l{int.Parse(FF14Chat_Main.bindBucket[1]) - 9} [组队频道] {msgItem.Username} : {msgItem}");
+			if(!"0000".Equals(FF14Chat_Main.bindBucket[1]) && msgItem.UserId != 0) {
+				Command.DoTextCommand($"/e [组队频道] {msgItem.Username} : {msgItem.message}");
 			}
 		}
 		public void dataGridMessage3Add(MsgItem msgItem) {
@@ -512,8 +505,8 @@ namespace FF14Chat.Controls {
 
 			if(scroll3)
 				dataGridMessage3.FirstDisplayedScrollingRowIndex = dataGridMessage3.Rows.Count - 1;
-			if(!"0000".Equals(FF14Chat_Main.bindBucket[2])) {
-				command?.DoTextCommand($"/l{int.Parse(FF14Chat_Main.bindBucket[2]) - 9} [交易频道] {msgItem.Username} : {msgItem}");
+			if(!"0000".Equals(FF14Chat_Main.bindBucket[2]) && msgItem.UserId!=0) {
+				Command.DoTextCommand($"/e [交易频道] {msgItem.Username} : {msgItem.message}");
 			}
 		}
 		#endregion
@@ -526,15 +519,29 @@ namespace FF14Chat.Controls {
 			loginForm.Show();
 		}
 
-		public async Task autoLoginAsync() {
+		public async Task autoLoginAsync(ulong contentID) {
 
-			LoginUser loginUser = new LoginUser();
-			XmlUtils.LoadUserSettingsByUserItem(loginUser);
+			LoginUser loginUser = XmlUtils.LoadUserSettingsByAutoLogin(contentID);
+			if(loginUser == null)
+				return;
 
-			this.loginForm = await LoginForm.CreateLoginForm();
-			loginForm.ContentClosed += Form_ContentClosed;
-			loginForm.autoLogin(loginUser);
-			registerForm.Show();
+			Log.info($"loginUser: {loginUser.ServerId},{loginUser.Name},{loginUser.Password}");
+
+			LoginUserResult result = await NetworkUtil.loginUser(loginUser);
+	
+			if(result != null) {
+				if(result.getToken() != "" && result.getToken() != null) {
+					FF14Chat_Main.isLogin = true;
+				}
+				result.setServerId(loginUser.ServerId);
+				result.setAliasName(loginUser.Name.Trim());
+				result.setPassword(loginUser.Password.Trim());
+				Log.info("autoLogin sucess");
+				allGroupsVisiable();
+				FF14Chat_Main.loginUserResult = result;
+
+				main.startServiceProcess();
+			}
 		}
 
 		//注册界面

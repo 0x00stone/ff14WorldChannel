@@ -4,7 +4,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Xml;
 
 namespace FF14Chat.Common {
 	public static class Log {
@@ -41,6 +40,10 @@ namespace FF14Chat.Common {
 
 		public static void error(string message) {
 			EnqueueLog($"ERROR: {message}");
+		}
+
+		public static void debug(string message) {
+			EnqueueLog($"DEBUG: {message}");
 		}
 
 		private static void EnqueueLog(string message) {

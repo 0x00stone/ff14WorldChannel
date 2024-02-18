@@ -13,3 +13,18 @@ C:\Users\Administrator\Desktop\FF14Chat-c\obj\Debug\FF14Chat.Controls.LoginForm.
 C:\Users\Administrator\Desktop\FF14Chat-c\bin\Debug\Newtonsoft.Json.xml
 C:\Users\Administrator\Desktop\FF14Chat-c\obj\Debug\FF14Chat.Controls.RegisterForm.resources
 C:\Users\Administrator\Desktop\FF14Chat-c\obj\Debug\FF14Chat.Controls.FF14ChatUi.resources
+C:\Users\Administrator\Desktop\ff14WorldChannel\bin\Debug\FF14Chat-c.dll
+C:\Users\Administrator\Desktop\ff14WorldChannel\bin\Debug\FF14Chat-c.pdb
+C:\Users\Administrator\Desktop\ff14WorldChannel\bin\Debug\Advanced Combat Tracker.xml
+C:\Users\Administrator\Desktop\ff14WorldChannel\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Administrator\Desktop\ff14WorldChannel\bin\Debug\System.Diagnostics.DiagnosticSource.xml
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.csproj.AssemblyReference.cache
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat.Controls.FF14ChatUi.resources
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat.Controls.LoginForm.resources
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat.Controls.RegisterForm.resources
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.csproj.GenerateResource.cache
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.csproj.Fody.CopyLocal.cache
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.csproj.CopyComplete
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.dll
+C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.pdb

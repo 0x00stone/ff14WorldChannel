@@ -2,10 +2,8 @@
 using FF14Chat.Common;
 using FF14Chat_c.Models;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace FF14Chat.Controls {
 	public class XmlUtils {
@@ -17,7 +15,6 @@ namespace FF14Chat.Controls {
 
 		private static string lowerBound = "0010";
 		private static string upperBound = "0017";
-		private static string defaultURL = "http://101.43.27.147/";
 
 		public static void LoadSysSettings(FF14ChatUi ff14ChatUi) {
 			if(File.Exists(SysSettingsFile)) {
@@ -94,68 +91,16 @@ namespace FF14Chat.Controls {
 						}
 					}
 
-					string host = doc.SelectSingleNode("/root/host")?.InnerText;
-					if(host != null && !"".Equals(host)) {
-						NetworkUtil.setURL(host);
-					} else {
-						NetworkUtil.setURL(defaultURL);
-					}
-
 
 				} catch(Exception e) {
-					NetworkUtil.setURL(defaultURL);
 					Log.error("配置sys文件载入异常");
 					Log.error("已清除错误的配置文件");
 					Log.error("设置已被重置");
 					Log.error(e.Message);
 				}
-			} else {
-				NetworkUtil.setURL(defaultURL);
 			}
 		}
 
-		public static void SaveSysSettingsURL(string url) {
-			XmlDocument doc = new XmlDocument();
-
-			if(!File.Exists(SysSettingsFile)) {
-				string directoryPath = Path.GetDirectoryName(SysSettingsFile);
-				Directory.CreateDirectory(directoryPath);
-
-				XmlElement rootElement = doc.CreateElement("root");
-				doc.AppendChild(rootElement);
-			} else {
-				doc.Load(SysSettingsFile);
-			}
-
-
-			XmlNodeList configElements = doc.GetElementsByTagName("config");
-			if(configElements.Count == 0) {
-				XmlElement configElement = doc.CreateElement("config");
-				doc.DocumentElement?.AppendChild(configElement);
-
-				XmlElement hostNode = doc.CreateElement("host");
-				configElement?.AppendChild(hostNode);
-
-				hostNode.InnerText = url;
-			} else {
-				bool isExist = false;
-				foreach(XmlElement temp in configElements) {
-					foreach(XmlElement a in temp) {
-						if("host".Equals(a.Name)) {
-							a.InnerText = url;
-							isExist = true;
-						} 
-					}
-				}
-				if(!isExist) {
-					XmlElement configElement = doc.GetElementById("config");
-					XmlElement BindNode = doc.CreateElement("host");
-					configElement?.AppendChild(BindNode);
-					BindNode.InnerText = url;
-				}
-			}
-			doc.Save(SysSettingsFile);
-		}
 
 		public static void SaveSysSettingsBind(string bind,int bucket) {
 			XmlDocument doc = new XmlDocument();
@@ -407,15 +352,14 @@ namespace FF14Chat.Controls {
 					loginForm.setRememberaliasname(bool.Parse(rememberPassword));
 					loginForm.setAutoLogin(bool.Parse(autoLogin));
 
-					loginForm.setAliasName(lastLoginUser);
 
 					if(bool.Parse(rememberPassword)) {
-						XmlNode userNode = doc.SelectSingleNode($"/root/{lastLoginUser}");
-						if(userNode == null) return;
-
-
-						loginForm.setServerId(userNode.SelectSingleNode("serverid")?.InnerText);
-						loginForm.setPassword(userNode.SelectSingleNode("password")?.InnerText);
+						XmlNode userNode = doc.SelectSingleNode($"/root/id{lastLoginUser}");
+						if(userNode != null) {
+							loginForm.setServerId(userNode.SelectSingleNode("serverName")?.InnerText);
+							loginForm.setPassword(userNode.SelectSingleNode("password")?.InnerText);
+							loginForm.setAliasName(userNode.SelectSingleNode("name")?.InnerText);
+						}
 					}
 
 				} catch(Exception) {
@@ -427,8 +371,9 @@ namespace FF14Chat.Controls {
 			}
 		}
 
-		public static void LoadUserSettingsByUserItem(LoginUser loginUser) {
+		public static LoginUser LoadUserSettingsByAutoLogin(ulong content) {
 			if(File.Exists(UserSettingsFile)) {
+				LoginUser loginUser = new LoginUser();
 				XmlDocument doc = new XmlDocument();
 				try {
 					doc.Load(UserSettingsFile);
@@ -436,19 +381,15 @@ namespace FF14Chat.Controls {
 					XmlNode configNode = doc.SelectSingleNode("/root/config");
 					if(configNode == null)
 						throw new InvalidOperationException("Config node not found in the XML document.");
-					string rememberPassword = configNode.SelectSingleNode("rememberPassword")?.InnerText;
-					string lastLoginUser = configNode.SelectSingleNode("lastLoginuser")?.InnerText;
 					string autoLogin = configNode.SelectSingleNode("isautoLogin")?.InnerText;
 
-					loginUser.Name = lastLoginUser;
-
-					XmlNode userNode = doc.SelectSingleNode($"/root/{lastLoginUser}");
-					if(userNode == null) return;
-					if(bool.Parse(autoLogin)) {
-						loginUser.ServerId = userNode.SelectSingleNode("serverid")?.InnerText;
+					XmlNode userNode = doc.SelectSingleNode($"/root/id{content}");
+					if(userNode != null && bool.Parse(autoLogin)) {
+						loginUser.ServerId = userNode.SelectSingleNode("serverID")?.InnerText;
 						loginUser.Password = userNode.SelectSingleNode("password")?.InnerText;
+						loginUser.Name = userNode.SelectSingleNode("name")?.InnerText;
 					}
-
+					return loginUser;
 				} catch(Exception) {
 					Log.error("配置user文件载入异常");
 					Log.error("已清除错误的配置文件");
@@ -456,9 +397,10 @@ namespace FF14Chat.Controls {
 					File.Delete(UserSettingsFile);
 				}
 			}
+			return null;
 		}
 
-		public static void SaveUserSettings(bool isRememberPassword, bool isAutologin, string aliasname, string serverId, string password) {
+		public static void SaveUserSettings(bool isRememberPassword, bool isAutologin, string aliasname, string serverName, string password,string contentID,string serverId) {
 			XmlDocument doc = new XmlDocument();
 
 			if(!File.Exists(UserSettingsFile)) {
@@ -488,14 +430,14 @@ namespace FF14Chat.Controls {
 
 				rememberPasswordNode.InnerText = isRememberPassword.ToString();
 				autoLoginNode.InnerText = isAutologin.ToString();
-				lastLoginuserNode.InnerText = aliasname;
+				lastLoginuserNode.InnerText = contentID;
 			} else {
 				foreach(XmlElement temp in configElements) {
 					foreach(XmlElement a in temp) {
 						if("rememberPassword".Equals(a.Name)) {
 							a.InnerText = isRememberPassword.ToString();
 						} else if("lastLoginuser".Equals(a.Name)) {
-							a.InnerText = aliasname;
+							a.InnerText = contentID;
 						} else if("isautoLogin".Equals(a.Name)) {
 							a.InnerText = isAutologin.ToString();
 						}
@@ -503,25 +445,37 @@ namespace FF14Chat.Controls {
 				}
 			}
 
-			XmlNodeList nodeList = doc.GetElementsByTagName(aliasname);
+			XmlNodeList nodeList = doc.GetElementsByTagName("id"+contentID);
 			if(nodeList.Count == 0) {
-				XmlElement usernameElement = doc.CreateElement(aliasname);
+				XmlElement usernameElement = doc.CreateElement("id" + contentID);
 				doc.DocumentElement?.AppendChild(usernameElement);
 
-				XmlElement serveridElement = doc.CreateElement("serverid");
-				serveridElement.InnerText = serverId;
-				usernameElement?.AppendChild(serveridElement);
+				XmlElement serverNameElement = doc.CreateElement("serverName");
+				serverNameElement.InnerText = serverName;
+				usernameElement?.AppendChild(serverNameElement);
 
 				XmlElement passwordElement = doc.CreateElement("password");
 				passwordElement.InnerText = password;
 				usernameElement?.AppendChild(passwordElement);
+
+				XmlElement nameElement = doc.CreateElement("name");
+				nameElement.InnerText = aliasname;
+				usernameElement?.AppendChild(nameElement);
+
+				XmlElement serverIdElement = doc.CreateElement("serverID");
+				serverIdElement.InnerText = serverId.ToString();
+				usernameElement?.AppendChild(serverIdElement);
 			} else {
 				foreach(XmlElement temp in nodeList) {
 					foreach(XmlElement a in temp) {
-						if("serverid".Equals(a.Name)) {
-							a.InnerText = serverId;
+						if("serverName".Equals(a.Name)) {
+							a.InnerText = serverName;
 						} else if("password".Equals(a.Name)) {
 							a.InnerText = password;
+						} else if("name".Equals(a.Name)) {
+							a.InnerText = aliasname;
+						} else if("serverID".Equals(a.Name)) {
+							a.InnerText = serverId.ToString();
 						}
 					}
 				}

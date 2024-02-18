@@ -2,11 +2,11 @@
 using FF14Chat.Models;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using FF14Chat.Common;
 using FF14Chat_c.Models;
+using FF14Chat.Network;
 
 namespace FF14Chat.Controls {
 
@@ -83,79 +83,27 @@ namespace FF14Chat.Controls {
 			string partition = (string)comboBox1.SelectedItem;
 			string server = (string)comboBox2.SelectedItem;
 
-			if(username.Length >= 10) {
-				MessageBox.Show("用户名称大于10个字符", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(System.Text.RegularExpressions.Regex.IsMatch(username, @"[^a-zA-Z0-9_\-\u4e00-\u9fa5]")) {
-				MessageBox.Show("用户名只可以使用字母，数字，中文和_-", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(username == null || "".Equals(username) || password == null || "".Equals(password)) {
-				MessageBox.Show("用户名或密码为空", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(partition == null || partition == "" || server == null || server == "") {
-				MessageBox.Show("未选择服务器", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
+			LoginUser loginUser = new LoginUser();
+			loginUser.Name = username;
+			loginUser.Password = password;
+			loginUser.ServerId = resultMap[partition][server];
 
-			var jsonObject = new {
-				aliasName = username.Trim(),
-				password = password.Trim().GetHashCode(),
-				serverId = resultMap[partition][server]
-			};
-			string json = SerializeUtil.ToJson(jsonObject);
 
-			this.result = await NetworkUtil.Login(json);
-			if("".Equals(result.getToken())) {
+			LoginUserResult result = await NetworkUtil.loginUser(loginUser);
+			if(result != null) {
+				this.result = result;
+				if(!"".Equals(result.getToken())) {
+					result.setServerId(resultMap[partition][server]);
+					result.setAliasName(username.Trim());
+					result.setPassword(password.Trim());
+					XmlUtils.SaveUserSettings(checkBox1.Checked, checkBox2.Checked, username.Trim(), partition + ":" + server, password.Trim(), result.getcontent(), loginUser.ServerId);
+				}
 
-			} else {
-				result.setServerId(resultMap[partition][server]);
-				result.setAliasName(username.Trim());
-				result.setPassword(password.Trim());
-				XmlUtils.SaveUserSettings(checkBox1.Checked, checkBox2.Checked, username.Trim(), partition + ":" + server, password.Trim());
+				if(this.result.getToken() != "" && this.result.getToken() != null) {
+					FF14Chat_Main.isLogin = true;
+				}
+				this.Close();
 			}
-
-			FF14Chat_Main.isLogin = true;
-			this.Close();
-		}
-
-		public async void autoLogin(LoginUser loginUser) {
-			Log.info($"try to autoLogin");
-
-			string username = loginUser.Name;
-			string password = loginUser.Password;
-			string partition = loginUser.ServerId.Split(':')[0];
-			string server = loginUser.ServerId.Split(':')[1];
-
-			if(username.Length >= 10) {
-				MessageBox.Show("用户名称大于10个字符", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(System.Text.RegularExpressions.Regex.IsMatch(username, @"[^a-zA-Z0-9_\-\u4e00-\u9fa5]")) {
-				MessageBox.Show("用户名只可以使用字母，数字，中文和_-", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(username == null || "".Equals(username) || password == null || "".Equals(password)) {
-				MessageBox.Show("用户名或密码为空", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(partition == null || partition == "" || server == null || server == "") {
-				MessageBox.Show("未选择服务器", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-
-			var jsonObject = new {
-				aliasName = username.Trim(),
-				password = password.Trim().GetHashCode(),
-				serverId = resultMap[partition][server]
-			};
-			string json = SerializeUtil.ToJson(jsonObject);
-
-			this.result = await NetworkUtil.Login(json);
-			FF14Chat_Main.isLogin = true;
-			this.Close();
 		}
 
 		private void cancelButton_Click(object sender, EventArgs e) {
@@ -200,50 +148,6 @@ namespace FF14Chat.Controls {
 
 		public void setAutoLogin(bool isAutoLogin) {
 			this.checkBox2.Checked = isAutoLogin;
-		}
-
-		private async void button3_Click(object sender, EventArgs e) {
-			string username = textBox1.Text;
-			string password = textBox2.Text;
-			string partition = (string)comboBox1.SelectedItem;
-			string server = (string)comboBox2.SelectedItem;
-
-			if(username.Length >= 10) {
-				MessageBox.Show("用户名称大于10个字符", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(System.Text.RegularExpressions.Regex.IsMatch(username, @"[^a-zA-Z0-9_\-\u4e00-\u9fa5]")) {
-				MessageBox.Show("用户名只可以使用字母，数字，中文和_-", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(username == null || "".Equals(username) || password == null || "".Equals(password)) {
-				MessageBox.Show("用户名或密码为空", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-			if(partition == null || partition == "" || server == null || server == "") {
-				MessageBox.Show("未选择服务器", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return;
-			}
-
-			var jsonObject = new {
-				aliasName = username.Trim(),
-				password = password.Trim(),
-				serverId = resultMap[partition][server]
-			};
-			string json = SerializeUtil.ToJson(jsonObject);
-
-			this.result = await NetworkUtil.Login(json);
-			if("".Equals(result.getToken())) {
-
-			} else {
-				result.setServerId(resultMap[partition][server]);
-				result.setAliasName(username.Trim());
-				result.setPassword(password.Trim());
-				XmlUtils.SaveUserSettings(checkBox1.Checked, checkBox2.Checked, username.Trim(), partition + ":" + server, password.Trim());
-			}
-
-			FF14Chat_Main.isLogin = true;
-			this.Close();
 		}
 	}
 }
