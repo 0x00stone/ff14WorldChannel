@@ -76,7 +76,7 @@ namespace FF14Chat.Controls {
 				MessageBox.Show("两次密码不相同！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
-			if(FF14Chat_Main.playerContent != 0) {
+			if(FF14Chat_Main.playerContent == 0) {
 				MessageBox.Show("请先登录游戏角色再注册账号", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}

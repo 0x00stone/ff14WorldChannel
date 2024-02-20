@@ -10,6 +10,7 @@ using FF14Chat.Actions;
 using System.Collections.Generic;
 using System;
 using FF14Chat.Network;
+using System.Text;
 
 namespace FF14Chat {
 	public class FF14Chat_Main : IActPluginV1 {
@@ -24,7 +25,7 @@ namespace FF14Chat {
 		private BackgroundWorker _ServiceProcessSwitcher;
 		private BackgroundWorker _clientProcessSwitcher;
 
-		public static bool isGameOn = false; //游戏是否打开
+		//public static bool isGameOn = false; //游戏是否打开
 		public static bool isLogin = false; //聊天账户是否登录
 		public static bool isRunning = true; //插件是否运行
 
@@ -37,15 +38,35 @@ namespace FF14Chat {
 		// 0 : "0010"
 		// 1 : "0015"
 		// 2 : "0017"
-		private Command command;
+		TabPage tabPage;
+
+		public static ulong playerContent = 0;
+
+		public void restart() {
+			DeInitPlugin();
+			init(tabPage);
+		}
 
 
 		#region init/de
 		public void InitPlugin(TabPage pluginScreenSpace, System.Windows.Forms.Label pluginStatusText) {
+			this.tabPage = pluginScreenSpace;
 			pluginScreenSpace.Text = "世界频道";
 			_lblStatus = pluginStatusText;
+			init(pluginScreenSpace);
+			
 
-			command = new Command();
+			_lblStatus.Text = "世界频道启动 :D";
+		}
+
+		public void DeInitPlugin() {
+			isRunning = false;
+			//ActGlobals.oFormActMain.OnLogLineRead -= PluginUI.oFormActMain_OnLogLineRead;
+			Log.Shutdown();
+			_lblStatus.Text = "世界频道停止 :(";
+		}
+
+		private void init(TabPage pluginScreenSpace) {
 			allowWord = new HashSet<String>();
 			notAllowWord = new HashSet<String>();
 			userBlanklist = new List<String>();
@@ -61,16 +82,8 @@ namespace FF14Chat {
 			_clientProcessSwitcher = new BackgroundWorker { WorkerSupportsCancellation = true };
 			_clientProcessSwitcher.DoWork += service.ProcessSwitcher;
 			_clientProcessSwitcher.RunWorkerAsync();
-
-			_lblStatus.Text = "世界频道启动 :D";
 		}
 
-		public void DeInitPlugin() {
-			isRunning = false;
-			//ActGlobals.oFormActMain.OnLogLineRead -= PluginUI.oFormActMain_OnLogLineRead;
-			Log.Shutdown();
-			_lblStatus.Text = "世界频道停止 ";
-		}
 
 		public void startServiceProcess() {
 			_ServiceProcessSwitcher = new BackgroundWorker { WorkerSupportsCancellation = true };
@@ -96,7 +109,7 @@ namespace FF14Chat {
 			PluginUI.setLabelGameProcessStatus(processNum);
 		}
 
-		public static ulong playerContent = 0;
+
 
 		public void setPlayerContent(ulong playerContent) {
 			if((FF14Chat_Main.playerContent != 0) && (FF14Chat_Main.playerContent != playerContent)) {
@@ -114,23 +127,15 @@ namespace FF14Chat {
 			PluginUI.addMessage(message);
 		}
 
-		public void dataGridMessage1Add(string time, string message) {
-			PluginUI.dataGridMessage1Add(time, message);
-		}
 		public void dataGridMessage1Add(MsgItem msgItem) {
 			PluginUI.dataGridMessage1Add(msgItem);
 		}
 
-		public void dataGridMessage2Add(string time, string message) {
-			PluginUI.dataGridMessage2Add(time, message);
-		}
+
 		public void dataGridMessage2Add(MsgItem msgItem) {
 			PluginUI.dataGridMessage2Add(msgItem);
 		}
 
-		public void dataGridMessage3Add(string time, string message) {
-			PluginUI.dataGridMessage3Add(time, message);
-		}
 		public void dataGridMessage3Add(MsgItem msgItem) {
 			PluginUI.dataGridMessage3Add(msgItem);
 		}
@@ -151,8 +156,11 @@ namespace FF14Chat {
 		}
 
 		#endregion
+
+		
 	}
 }
 //TODO
-//用户列表
 //login时间特别长
+//注册数据库用户content为0
+//鲶鱼精发送消息

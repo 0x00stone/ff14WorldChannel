@@ -1,6 +1,6 @@
 ﻿
 
-namespace FF14Chat_c.Models {
+namespace FF14Chat.Models {
 	public class LoginUser {
 		public string ServerName { get; set; }
 		public string ServerId { get; set; }

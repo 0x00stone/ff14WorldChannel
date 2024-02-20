@@ -2,24 +2,18 @@
 using System.Text;
 using FF14Chat.Common;
 
-namespace FF14Chat.Network {
+namespace FF14Chat.Actions {
 	public class Command {
 
 		const int maxByteLength = 180;
-
-		public static void DoTextCommand(string command) {
-			Log.info("command: " + command);
-			if(!FF14Chat_Main.isGameOn) {
-				Log.error("没有对应的游戏进程");
-				return;
-			}
+		public void DoTextCommand(string command) {
 
 			if(command == "") {
 				Log.error("command 指令为空");
 				return;
 			}
 
-			// 去掉command中的所有换行符
+			Log.info("command: " + command);
 			command = command.Replace("\n", "").Replace("\r", "");
 
 
@@ -27,8 +21,12 @@ namespace FF14Chat.Network {
 			if(Encoding.UTF8.GetByteCount(command) > maxByteLength) {
 				Log.error($"DoTextCommand: 上一条命令中，文本{command}被忽略，因为系统宏的限制在180个字节以内。");
 			} else {
+				Network.NetworkUtil.SendPostRequest("http://127.0.0.1:1002/command",command);
 				Log.debug($"sendToPostNamazu: {command}");
-				NetworkUtil.sendToPostNamazu(command);
+				/*if(PostNamazu!=null) {
+					Log.debug($"sendToPostNamazu: {command}");
+					PostNamazu.DoAction("command", command);
+				}*/
 			}
 		}
 	}

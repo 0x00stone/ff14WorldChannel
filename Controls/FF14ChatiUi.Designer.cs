@@ -177,6 +177,8 @@ namespace FF14Chat.Controls {
 			// 
 			// groupBoxStatus
 			// 
+			this.groupBoxStatus.Controls.Add(this.buttonRegister);
+			this.groupBoxStatus.Controls.Add(this.buttonLogin);
 			this.groupBoxStatus.Controls.Add(this.labelLoginStatus);
 			this.groupBoxStatus.Controls.Add(this.labelGameProcessStatus);
 			this.groupBoxStatus.Controls.Add(this.labelFFXIVPluginStatus);
@@ -317,7 +319,7 @@ namespace FF14Chat.Controls {
 			// 
 			// buttonLogin
 			// 
-			this.buttonLogin.Location = new System.Drawing.Point(39, 3);
+			this.buttonLogin.Location = new System.Drawing.Point(191, 28);
 			this.buttonLogin.Name = "buttonLogin";
 			this.buttonLogin.Size = new System.Drawing.Size(75, 23);
 			this.buttonLogin.TabIndex = 5;
@@ -327,7 +329,7 @@ namespace FF14Chat.Controls {
 			// 
 			// buttonRegister
 			// 
-			this.buttonRegister.Location = new System.Drawing.Point(171, 3);
+			this.buttonRegister.Location = new System.Drawing.Point(191, 71);
 			this.buttonRegister.Name = "buttonRegister";
 			this.buttonRegister.Size = new System.Drawing.Size(75, 23);
 			this.buttonRegister.TabIndex = 8;
@@ -421,8 +423,8 @@ namespace FF14Chat.Controls {
 			this.dataGridMessage1.ColumnHeadersVisible = false;
 			this.dataGridMessage1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn11,
-            this.dataGridViewTextBoxColumn12,});
-			this.dataGridMessage1.Location = new System.Drawing.Point(0, 0);
+            this.dataGridViewTextBoxColumn12});
+			this.dataGridMessage1.Location = new System.Drawing.Point(-2, 3);
 			this.dataGridMessage1.MultiSelect = false;
 			this.dataGridMessage1.Name = "dataGridMessage1";
 			this.dataGridMessage1.ReadOnly = true;
@@ -438,7 +440,6 @@ namespace FF14Chat.Controls {
 			// 
 			this.dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
 			this.dataGridViewTextBoxColumn11.ReadOnly = true;
-			this.dataGridViewTextBoxColumn11.Width = 70;
 			// 
 			// dataGridViewTextBoxColumn12
 			// 
@@ -493,7 +494,6 @@ namespace FF14Chat.Controls {
 			// 
 			this.dataGridViewTextBoxColumn21.Name = "dataGridViewTextBoxColumn21";
 			this.dataGridViewTextBoxColumn21.ReadOnly = true;
-			this.dataGridViewTextBoxColumn21.Width = 70;
 			// 
 			// dataGridViewTextBoxColumn22
 			// 
@@ -529,7 +529,6 @@ namespace FF14Chat.Controls {
 			// 
 			this.dataGridViewTextBoxColumn31.Name = "dataGridViewTextBoxColumn31";
 			this.dataGridViewTextBoxColumn31.ReadOnly = true;
-			this.dataGridViewTextBoxColumn31.Width = 70;
 			// 
 			// dataGridViewTextBoxColumn32
 			// 
@@ -773,10 +772,8 @@ namespace FF14Chat.Controls {
 			this.Controls.Add(this.groupBoxBind);
 			this.Controls.Add(this.tabControl);
 			this.Controls.Add(this.groupboxUser);
-			this.Controls.Add(this.buttonLogin);
 			this.Controls.Add(this.groupBoxRule);
 			this.Controls.Add(this.groupBoxStatus);
-			this.Controls.Add(this.buttonRegister);
 			this.Name = "FF14ChatUi";
 			this.Size = new System.Drawing.Size(897, 480);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridUser)).EndInit();

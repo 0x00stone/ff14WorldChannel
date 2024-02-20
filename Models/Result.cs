@@ -7,12 +7,21 @@ namespace FF14Chat.Models {
 		private string aliasname;
 		private string password;
 		private string content;
+		private string errorMessage = null;
 
 		public LoginUserResult(string serverId, string token, string aliasname, string password) {
 			this.token = token;
 			this.serverId = serverId;
 			this.aliasname = aliasname;
 			this.password = password;
+		}
+
+		public void setErrorMessage(string errorMessage) {
+			this.errorMessage = errorMessage;
+		}
+
+		public string getErrorMessage() {
+			return this.errorMessage;
 		}
 
 		public void setContent(string content) {

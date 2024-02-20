@@ -28,3 +28,4 @@ C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.csproj.Fody
 C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.csproj.CopyComplete
 C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.dll
 C:\Users\Administrator\Desktop\ff14WorldChannel\obj\Debug\FF14Chat-c.pdb
+C:\Users\Administrator\Desktop\ff14WorldChannel\bin\Debug\FF14Chat-c.dll.config

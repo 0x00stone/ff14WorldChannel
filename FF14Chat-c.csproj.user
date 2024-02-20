@@ -8,4 +8,12 @@
     <StartAction>Program</StartAction>
     <StartProgram>H:\ff14\ACT\CafeACT.exe</StartProgram>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM64'">
+    <StartProgram>H:\ff14\ACT\CafeACT.exe</StartProgram>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'">
+    <StartProgram>H:\ff14\ACT\CafeACT.exe</StartProgram>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
 </Project>

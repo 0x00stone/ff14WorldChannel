@@ -1,6 +1,6 @@
 ﻿using Advanced_Combat_Tracker;
 using FF14Chat.Common;
-using FF14Chat_c.Models;
+using FF14Chat.Models;
 using System;
 using System.IO;
 using System.Xml;

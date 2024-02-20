@@ -13,6 +13,10 @@ using System.Transactions;
 using System.Diagnostics;
 using System.Linq;
 using FF14Chat.Network;
+using System.Collections;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace FF14Chat.Actions {
 	public class Service {
@@ -28,13 +32,23 @@ namespace FF14Chat.Actions {
 
 				//登录（心跳）
 				LoginUserResult localresult = await NetworkUtil.Heartbeat(FF14Chat_Main.loginUserResult);
-				string token = localresult.getToken();
-				if("".Equals(token)) {
-					Log.info("心跳获取token为空");
+				if(localresult.getErrorMessage() != null) {
+					MessageBox.Show(localresult.getErrorMessage(), "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				} else {
-					FF14Chat_Main.loginUserResult = localresult;
-				}
+					string token = localresult.getToken();
+					if("".Equals(token)) {
+						Log.info("心跳获取token为空");
+					} else {
+						FF14Chat_Main.loginUserResult = localresult;
+					}
 
+					if(FF14Chat_Main.playerContent != 0 && ulong.Parse(localresult.getcontent()) != FF14Chat_Main.playerContent) {
+						//1. 尝试切换用户
+						Log.error("游戏帐户与聊天账户非绑定，请重新登录");
+						MessageBox.Show("游戏帐户与聊天账户非绑定，请重新登录", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						main.restart();
+					}
+				}
 				Thread.Sleep(5000);
 			}
 		}
@@ -77,18 +91,40 @@ namespace FF14Chat.Actions {
 
 			if(200 == ((int)userJSON["code"])) {
 				JToken dataToken = userJSON["data"];
+				Dictionary<string, string> nameTable = new Dictionary<string, string>();
+				Dictionary<string, int> statusTable = new Dictionary<string, int>();
+
 				foreach(JValue jValue in dataToken) {
 					string id = jValue.ToString().Split(':')[0];
 					string name = jValue.ToString().Split(':')[1];
 
 					if("@".Equals(name)) {
-						removeUser(id);
-						Log.info("removeUser(" + id + ")");
+						if(statusTable.ContainsKey(id)) {
+							statusTable[id] = statusTable[id]-1;
+						} else {
+							statusTable.Add(id, -1);
+						}
+						
 					} else {
-						addUser(id, name);
-						Log.info("addUser(" + id + ")");
+						if(statusTable.ContainsKey(id)) {
+							statusTable[id] = statusTable[id] +1 ;
+						} else {
+							statusTable.Add(id, 1);
+						}
+						nameTable.Add(id, name);
+
 					}
 				}
+
+				foreach(string key in statusTable.Keys) {
+					int status = statusTable[key];
+					if(status >= 1) {
+						addUser(key, nameTable[key]);
+					} else if(status <= -1) {
+						removeUser(key);
+					}
+				}
+
 			} else if(401 == ((int)userJSON["code"])) {
 				textCommand = "获取当前用户发生错误: " + "请先登录聊天账号";
 			} else {
@@ -121,6 +157,7 @@ namespace FF14Chat.Actions {
 					main.dataGridUserAdd(row);
 				}
 			}
+			Log.info($"addUser: id={id} , name={name}");
 		}
 		private void removeUser(string id) {
 			TransactionOptions options = new TransactionOptions();
@@ -133,6 +170,7 @@ namespace FF14Chat.Actions {
 					main.dataGridUserRemove(index);
 				}
 			}
+			Log.info($"removeUser: id={id} ");
 		}
 		#endregion
 
@@ -307,13 +345,7 @@ namespace FF14Chat.Actions {
 								string text = await NetworkUtil.sendMessage(FF14Chat_Main.loginUserResult, json);
 
 
-								if(i == 0) {
-									main.dataGridMessage1Add(DateTimeOffset.UtcNow.ToString(), text);
-								} else if(i == 1) {
-									main.dataGridMessage2Add(DateTimeOffset.UtcNow.ToString(), text);
-								} else if(i == 2) {
-									main.dataGridMessage3Add(DateTimeOffset.UtcNow.ToString(), text);
-								}
+								main.addMessage( text);
 							}
 						}
 						break;
@@ -336,33 +368,29 @@ namespace FF14Chat.Actions {
 		}
 		#endregion
 
+		
+
 		#region ProcessSwitcher
+		private bool hasAutoLogin = false;
 
 		public void ProcessSwitcher(object sender, DoWorkEventArgs e) {
 
 			//1. 获取ACT FFXIV解析插件
 			FFXIV_ACT_Plugin = GetFFXIVPlugin();
 			if(FFXIV_ACT_Plugin == null) {
-				Log.error("FFXIV_ACT_Plugin NULL");
-			}
-
-			while(true) {
-				ulong playerContent1 = 18014449513894560;
-				if(playerContent1 != 0 && (!FF14Chat_Main.isLogin)) {
-					main.autoLogin(playerContent1);
-					Thread.Sleep(50000);
-					//TODO: 
-				}
+				Log.error("FFXIV_ACT_Plugin null");
 			}
 
 			while(FF14Chat_Main.isRunning) {
 
-				Process process = GetFFXIVProcess();
+				Process process = FFXIV_ACT_Plugin.DataRepository.GetCurrentFFXIVProcess();
+
 				if(process != null) {
 					int processID = process.Id;
+					Log.info("processID:" + processID);
+
 
 					if(processID != 0) {
-						FF14Chat_Main.isGameOn = true;
 						main.setLabelGameProcessStatus(processID);
 
 						//getPlayerID
@@ -372,10 +400,9 @@ namespace FF14Chat.Actions {
 						main.setPlayerContent(playerContent);
 
 						//autoLogin
-						if(playerContent != 0 && (!FF14Chat_Main.isLogin)) {
+						if(playerContent != 0 && (!FF14Chat_Main.isLogin) && !hasAutoLogin) {
 							main.autoLogin(playerContent);
-							Thread.Sleep(5000);
-							//TODO: 
+							hasAutoLogin = true;
 						}
 					}
 				}
@@ -398,10 +425,6 @@ namespace FF14Chat.Actions {
 			}
 		}
 
-
-		private Process GetFFXIVProcess() {
-			return FFXIV_ACT_Plugin.DataRepository.GetCurrentFFXIVProcess();
-		}
 		#endregion
 	}
 }

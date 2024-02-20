@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using FF14Chat.Common;
-using FF14Chat_c.Models;
 using FF14Chat.Network;
 
 namespace FF14Chat.Controls {
@@ -88,20 +87,28 @@ namespace FF14Chat.Controls {
 			loginUser.Password = password;
 			loginUser.ServerId = resultMap[partition][server];
 
-
 			LoginUserResult result = await NetworkUtil.loginUser(loginUser);
-			if(result != null) {
-				this.result = result;
-				if(!"".Equals(result.getToken())) {
-					result.setServerId(resultMap[partition][server]);
-					result.setAliasName(username.Trim());
-					result.setPassword(password.Trim());
+
+			if(result.getErrorMessage() != null) {
+				MessageBox.Show(result.getErrorMessage(), "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			} else {
+
+				string token = result.getToken();
+				if("".Equals(token)) {
+					Log.info("心跳获取token为空");
+					return;
+				} else {
+					this.result = result;
+					result.setServerId(loginUser.ServerId);
+					result.setAliasName(loginUser.Name.Trim());
+					result.setPassword(loginUser.Password.Trim());
+					FF14Chat_Main.isLogin = true;
 					XmlUtils.SaveUserSettings(checkBox1.Checked, checkBox2.Checked, username.Trim(), partition + ":" + server, password.Trim(), result.getcontent(), loginUser.ServerId);
+
 				}
 
-				if(this.result.getToken() != "" && this.result.getToken() != null) {
-					FF14Chat_Main.isLogin = true;
-				}
+				Log.info("autoLogin sucess");
+
 				this.Close();
 			}
 		}

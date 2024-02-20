@@ -1,9 +1,9 @@
 ﻿
 
+using FF14Chat.Actions;
 using FF14Chat.Common;
 using FF14Chat.Models;
 using FF14Chat.Network;
-using FF14Chat_c.Models;
 using System;
 using System.Drawing;
 using System.Reflection;
@@ -13,14 +13,17 @@ using System.Windows.Forms;
 namespace FF14Chat.Controls {
 	public partial class FF14ChatUi : UserControl {
 
+		private Command command;
 		private FF14Chat_Main main;
 
 		public FF14ChatUi(FF14Chat_Main main) {
 			this.main = main;
+			this.command = new Command();
 			InitializeComponent();
 			allGroupsUnVisiable();
 			setComboboxValue();
 			XmlUtils.LoadSysSettings(this);
+		
 
 			addMessage($"当前插件版本为:{Assembly.GetExecutingAssembly().GetName().Version}");
 			new Update().getNewVersionAsync();
@@ -408,7 +411,7 @@ namespace FF14Chat.Controls {
 			dataGridMessage1Add($"[{DateTime.Now:HH:mm:ss}]", message);
 			dataGridMessage2Add($"[{DateTime.Now:HH:mm:ss}]", message);
 			dataGridMessage3Add($"[{DateTime.Now:HH:mm:ss}]", message);
-			Command.DoTextCommand($"/e [系统消息] : {message}");
+			command.DoTextCommand($"/e [系统消息] : {message}");
 		}
 
 		//系统消息
@@ -460,7 +463,7 @@ namespace FF14Chat.Controls {
 				dataGridMessage1.FirstDisplayedScrollingRowIndex = dataGridMessage1.Rows.Count - 1;
 
 			if(!"0000".Equals(FF14Chat_Main.bindBucket[0]) && msgItem.UserId != 0) {
-				Command.DoTextCommand($"/e [区域频道] {msgItem.Username} : {msgItem.message}");
+				command.DoTextCommand($"/e [区域频道] {msgItem.Username} : {msgItem.message}");
 			}
 		}
 		public void dataGridMessage2Add(MsgItem msgItem) {
@@ -483,7 +486,7 @@ namespace FF14Chat.Controls {
 			if(scroll2)
 				dataGridMessage2.FirstDisplayedScrollingRowIndex = dataGridMessage2.Rows.Count - 1;
 			if(!"0000".Equals(FF14Chat_Main.bindBucket[1]) && msgItem.UserId != 0) {
-				Command.DoTextCommand($"/e [组队频道] {msgItem.Username} : {msgItem.message}");
+				command.DoTextCommand($"/e [组队频道] {msgItem.Username} : {msgItem.message}");
 			}
 		}
 		public void dataGridMessage3Add(MsgItem msgItem) {
@@ -506,7 +509,7 @@ namespace FF14Chat.Controls {
 			if(scroll3)
 				dataGridMessage3.FirstDisplayedScrollingRowIndex = dataGridMessage3.Rows.Count - 1;
 			if(!"0000".Equals(FF14Chat_Main.bindBucket[2]) && msgItem.UserId!=0) {
-				Command.DoTextCommand($"/e [交易频道] {msgItem.Username} : {msgItem.message}");
+				command.DoTextCommand($"/e [交易频道] {msgItem.Username} : {msgItem.message}");
 			}
 		}
 		#endregion
@@ -522,26 +525,38 @@ namespace FF14Chat.Controls {
 		public async Task autoLoginAsync(ulong contentID) {
 
 			LoginUser loginUser = XmlUtils.LoadUserSettingsByAutoLogin(contentID);
-			if(loginUser == null)
-				return;
-
 			Log.info($"loginUser: {loginUser.ServerId},{loginUser.Name},{loginUser.Password}");
 
+			if(loginUser.ServerId == "" || loginUser.Name == "" || loginUser.Password == "") {
+				Log.error($"xml存储{contentID} 的ServerId：{loginUser.ServerId}，Name：{loginUser.Name}，Password：{loginUser.Password}存在空值");
+				return;
+			}
+
 			LoginUserResult result = await NetworkUtil.loginUser(loginUser);
-	
-			if(result != null) {
-				if(result.getToken() != "" && result.getToken() != null) {
-					FF14Chat_Main.isLogin = true;
-				}
+
+			string token = result.getToken();
+			if("".Equals(token)) {
+				Log.info("心跳获取token为空");
+				return;
+			} else {
 				result.setServerId(loginUser.ServerId);
 				result.setAliasName(loginUser.Name.Trim());
 				result.setPassword(loginUser.Password.Trim());
-				Log.info("autoLogin sucess");
-				allGroupsVisiable();
 				FF14Chat_Main.loginUserResult = result;
-
-				main.startServiceProcess();
+				FF14Chat_Main.isLogin = true;
 			}
+
+			if(FF14Chat_Main.playerContent != 0 && ulong.Parse(result.getcontent()) != FF14Chat_Main.playerContent) {
+				//1. 尝试切换用户
+				Log.error("游戏帐户与聊天账户非绑定，请重新登录");
+				MessageBox.Show("游戏帐户与聊天账户非绑定，请重新登录", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				main.restart();
+				return;
+			}
+
+			Log.info("autoLogin sucess");
+			allGroupsVisiable();
+			main.startServiceProcess();
 		}
 
 		//注册界面
@@ -555,6 +570,15 @@ namespace FF14Chat.Controls {
 			if(result != null && result.getToken() != null && !"".Equals(result.getToken()) && result.getServerId() != null && !"".Equals(result.getServerId())
 				&& result.getAliasname() != null && !"".Equals(result.getAliasname()) && result.getPassword() != null && !"".Equals(result.getPassword())) {
 				Log.info("Form_ContentClosed get token");
+
+				if(FF14Chat_Main.playerContent != 0 && ulong.Parse(result.getcontent()) != FF14Chat_Main.playerContent) {
+					//1. 尝试切换用户
+					Log.error("游戏帐户与聊天账户非绑定，请重新登录");
+					MessageBox.Show("游戏帐户与聊天账户非绑定，请重新登录", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					main.restart();
+					return;
+				}
+
 				allGroupsVisiable();
 				FF14Chat_Main.loginUserResult = result;
 
@@ -566,7 +590,7 @@ namespace FF14Chat.Controls {
 		#region common
 		public void allGroupsUnVisiable() {
 			this.tabControl.Visible = false;
-			this.groupBoxStatus.Visible = false;
+			this.groupBoxStatus.Visible = true;
 			this.groupBoxRule.Visible = false;
 			this.groupboxUser.Visible = false;
 			this.groupBoxBind.Visible = false;
