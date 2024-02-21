@@ -69,7 +69,7 @@ namespace FF14Chat.Actions {
 						textCommand = parseUsersJSON(userResponse);
 					}
 				} else {
-					string userResponse = await NetworkUtil.GetUsersByIncrement(FF14Chat_Main.loginUserResult);
+					string userResponse = await NetworkUtil.GetUsersByStock(FF14Chat_Main.loginUserResult);
 					if(userResponse == null || "".Equals(userResponse)) {
 						textCommand = "获取用户服务器增量数据失败";
 					} else {
@@ -90,39 +90,31 @@ namespace FF14Chat.Actions {
 			string textCommand = "";
 
 			if(200 == ((int)userJSON["code"])) {
+				Log.track($"code:{userJSON["code"]} , data: {userJSON["data"]}");
 				JToken dataToken = userJSON["data"];
-				Dictionary<string, string> nameTable = new Dictionary<string, string>();
-				Dictionary<string, int> statusTable = new Dictionary<string, int>();
+				Dictionary<string, string> statusTable = new Dictionary<string, string>();
 
 				foreach(JValue jValue in dataToken) {
 					string id = jValue.ToString().Split(':')[0];
 					string name = jValue.ToString().Split(':')[1];
-
-					if("@".Equals(name)) {
-						if(statusTable.ContainsKey(id)) {
-							statusTable[id] = statusTable[id]-1;
-						} else {
-							statusTable.Add(id, -1);
-						}
-						
+					if(statusTable.ContainsKey(id)) {
+						statusTable[id] = name;
 					} else {
-						if(statusTable.ContainsKey(id)) {
-							statusTable[id] = statusTable[id] +1 ;
-						} else {
-							statusTable.Add(id, 1);
-						}
-						nameTable.Add(id, name);
-
+						statusTable.Add(id, name);
 					}
 				}
 
 				foreach(string key in statusTable.Keys) {
-					int status = statusTable[key];
-					if(status >= 1) {
-						addUser(key, nameTable[key]);
-					} else if(status <= -1) {
+					Log.track($"key: {key} , value: {statusTable[key]}");
+					if("@".Equals(statusTable[key])) {
 						removeUser(key);
+					} else {
+						addUser(key, statusTable[key]);
 					}
+				}
+				int i = 0;
+				foreach(UserItem u in FF14Chat_Main.userList) {
+					Log.track($"{i} : id={u.Id},name={u.Name}");
 				}
 
 			} else if(401 == ((int)userJSON["code"])) {
@@ -140,11 +132,15 @@ namespace FF14Chat.Actions {
 					textCommand = "获取当前用户发生错误";
 				}
 			}
+			Log.track("");
+			Log.track("");
+			Log.track("");
+			Log.track(textCommand);
 			return textCommand;
 		}
 		private void addUser(string id, string name) {
 			TransactionOptions options = new TransactionOptions();
-			options.Timeout = TimeSpan.FromSeconds(2);
+			options.Timeout = TimeSpan.FromSeconds(3);
 
 			using(TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, options)) {
 				if(FF14Chat_Main.userList.FindIndex(item => item.Id.Equals(id)) < 0) {
@@ -156,12 +152,14 @@ namespace FF14Chat.Actions {
 					FF14Chat_Main.userList.Add(item);
 					main.dataGridUserAdd(row);
 				}
+				Log.track($"addUser : id={id}, name={name}");
+				scope.Complete();
 			}
 			Log.info($"addUser: id={id} , name={name}");
 		}
 		private void removeUser(string id) {
 			TransactionOptions options = new TransactionOptions();
-			options.Timeout = TimeSpan.FromSeconds(2);
+			options.Timeout = TimeSpan.FromSeconds(3);
 
 			using(TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, options)) {
 				int index = FF14Chat_Main.userList.FindIndex(item => item.Id.Equals(id));
@@ -169,6 +167,8 @@ namespace FF14Chat.Actions {
 					FF14Chat_Main.userList.RemoveAt(index);
 					main.dataGridUserRemove(index);
 				}
+				Log.track($"removeUser : id={id}");
+				scope.Complete();
 			}
 			Log.info($"removeUser: id={id} ");
 		}
@@ -315,6 +315,8 @@ namespace FF14Chat.Actions {
 		//TODO: 会读取发送到游戏的消息
 		public async void oFormActMain_OnLogLineRead(bool isImport, LogLineEventArgs logInfo) {
 			if(FF14Chat_Main.loginUserResult == null)
+				return;
+			if(logInfo.logLine.Length < 30)
 				return;
 
 			string substring = logInfo.logLine.Substring(0, 30);

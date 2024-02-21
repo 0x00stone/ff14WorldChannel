@@ -39,11 +39,15 @@ namespace FF14Chat.Common {
 		}
 
 		public static void error(string message) {
-			EnqueueLog($"ERROR: {message}");
+		//	EnqueueLog($"ERROR: {message}");
 		}
 
 		public static void debug(string message) {
-			EnqueueLog($"DEBUG: {message}");
+		//	EnqueueLog($"DEBUG: {message}");
+		}
+
+		public static void track(string message) {
+			EnqueueLog($"TRACK: {message}");
 		}
 
 		private static void EnqueueLog(string message) {

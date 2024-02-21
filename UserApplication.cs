@@ -27,7 +27,7 @@ namespace FF14Chat {
 
 		//public static bool isGameOn = false; //游戏是否打开
 		public static bool isLogin = false; //聊天账户是否登录
-		public static bool isRunning = true; //插件是否运行
+		public static bool isRunning = true; //插件是否正在运行
 
 		public static HashSet<String> allowWord;
 		public static HashSet<String> notAllowWord;

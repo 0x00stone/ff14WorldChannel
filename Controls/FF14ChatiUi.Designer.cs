@@ -42,6 +42,8 @@ namespace FF14Chat.Controls {
 			this.dataGridUser = new System.Windows.Forms.DataGridView();
 			this.dataGridViewUserColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.groupBoxStatus = new System.Windows.Forms.GroupBox();
+			this.buttonRegister = new System.Windows.Forms.Button();
+			this.buttonLogin = new System.Windows.Forms.Button();
 			this.labelLoginStatus = new System.Windows.Forms.Label();
 			this.labelGameProcessStatus = new System.Windows.Forms.Label();
 			this.labelFFXIVPluginStatus = new System.Windows.Forms.Label();
@@ -55,8 +57,6 @@ namespace FF14Chat.Controls {
 			this.checkBoxRuleSelect = new System.Windows.Forms.CheckBox();
 			this.buttonRuleAdd = new System.Windows.Forms.Button();
 			this.textBoxRule = new System.Windows.Forms.TextBox();
-			this.buttonLogin = new System.Windows.Forms.Button();
-			this.buttonRegister = new System.Windows.Forms.Button();
 			this.groupboxUser = new System.Windows.Forms.GroupBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.dataGridView1 = new System.Windows.Forms.DataGridView();
@@ -146,6 +146,8 @@ namespace FF14Chat.Controls {
 			// 
 			// dataGridUser
 			// 
+			this.dataGridUser.AllowUserToAddRows = false;
+			this.dataGridUser.AllowUserToDeleteRows = false;
 			this.dataGridUser.AllowUserToResizeColumns = false;
 			this.dataGridUser.AllowUserToResizeRows = false;
 			dataGridViewCellStyle1.BackColor = System.Drawing.Color.LightGray;
@@ -194,13 +196,33 @@ namespace FF14Chat.Controls {
 			this.groupBoxStatus.TabStop = false;
 			this.groupBoxStatus.Text = "状态";
 			// 
+			// buttonRegister
+			// 
+			this.buttonRegister.Location = new System.Drawing.Point(191, 71);
+			this.buttonRegister.Name = "buttonRegister";
+			this.buttonRegister.Size = new System.Drawing.Size(75, 23);
+			this.buttonRegister.TabIndex = 1;
+			this.buttonRegister.Text = "注册";
+			this.buttonRegister.UseVisualStyleBackColor = true;
+			this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click);
+			// 
+			// buttonLogin
+			// 
+			this.buttonLogin.Location = new System.Drawing.Point(191, 28);
+			this.buttonLogin.Name = "buttonLogin";
+			this.buttonLogin.Size = new System.Drawing.Size(75, 23);
+			this.buttonLogin.TabIndex = 0;
+			this.buttonLogin.Text = "登录";
+			this.buttonLogin.UseVisualStyleBackColor = true;
+			this.buttonLogin.Click += new System.EventHandler(this.buttonLogin_Click);
+			// 
 			// labelLoginStatus
 			// 
 			this.labelLoginStatus.AutoSize = true;
 			this.labelLoginStatus.Location = new System.Drawing.Point(90, 101);
 			this.labelLoginStatus.Name = "labelLoginStatus";
 			this.labelLoginStatus.Size = new System.Drawing.Size(71, 12);
-			this.labelLoginStatus.TabIndex = 7;
+			this.labelLoginStatus.TabIndex = 0;
 			this.labelLoginStatus.Text = "No Process.";
 			// 
 			// labelGameProcessStatus
@@ -209,7 +231,7 @@ namespace FF14Chat.Controls {
 			this.labelGameProcessStatus.Location = new System.Drawing.Point(90, 76);
 			this.labelGameProcessStatus.Name = "labelGameProcessStatus";
 			this.labelGameProcessStatus.Size = new System.Drawing.Size(71, 12);
-			this.labelGameProcessStatus.TabIndex = 6;
+			this.labelGameProcessStatus.TabIndex = 0;
 			this.labelGameProcessStatus.Text = "No Process.";
 			// 
 			// labelFFXIVPluginStatus
@@ -218,7 +240,7 @@ namespace FF14Chat.Controls {
 			this.labelFFXIVPluginStatus.Location = new System.Drawing.Point(90, 52);
 			this.labelFFXIVPluginStatus.Name = "labelFFXIVPluginStatus";
 			this.labelFFXIVPluginStatus.Size = new System.Drawing.Size(71, 12);
-			this.labelFFXIVPluginStatus.TabIndex = 5;
+			this.labelFFXIVPluginStatus.TabIndex = 0;
 			this.labelFFXIVPluginStatus.Text = "No Process.";
 			// 
 			// labelACTStatus
@@ -227,7 +249,7 @@ namespace FF14Chat.Controls {
 			this.labelACTStatus.Location = new System.Drawing.Point(90, 28);
 			this.labelACTStatus.Name = "labelACTStatus";
 			this.labelACTStatus.Size = new System.Drawing.Size(65, 12);
-			this.labelACTStatus.TabIndex = 4;
+			this.labelACTStatus.TabIndex = 0;
 			this.labelACTStatus.Text = "Running...";
 			// 
 			// labelLogin
@@ -236,7 +258,7 @@ namespace FF14Chat.Controls {
 			this.labelLogin.Location = new System.Drawing.Point(6, 101);
 			this.labelLogin.Name = "labelLogin";
 			this.labelLogin.Size = new System.Drawing.Size(47, 12);
-			this.labelLogin.TabIndex = 3;
+			this.labelLogin.TabIndex = 0;
 			this.labelLogin.Text = "Login: ";
 			// 
 			// labelGameProcess
@@ -245,7 +267,7 @@ namespace FF14Chat.Controls {
 			this.labelGameProcess.Location = new System.Drawing.Point(6, 76);
 			this.labelGameProcess.Name = "labelGameProcess";
 			this.labelGameProcess.Size = new System.Drawing.Size(83, 12);
-			this.labelGameProcess.TabIndex = 2;
+			this.labelGameProcess.TabIndex = 0;
 			this.labelGameProcess.Text = "GameProcess: ";
 			// 
 			// labelFFXIVPlugin
@@ -254,7 +276,7 @@ namespace FF14Chat.Controls {
 			this.labelFFXIVPlugin.Location = new System.Drawing.Point(6, 52);
 			this.labelFFXIVPlugin.Name = "labelFFXIVPlugin";
 			this.labelFFXIVPlugin.Size = new System.Drawing.Size(83, 12);
-			this.labelFFXIVPlugin.TabIndex = 1;
+			this.labelFFXIVPlugin.TabIndex = 0;
 			this.labelFFXIVPlugin.Text = "FFXIVPlugin: ";
 			// 
 			// labelACT
@@ -275,7 +297,7 @@ namespace FF14Chat.Controls {
 			this.groupBoxRule.Location = new System.Drawing.Point(12, 245);
 			this.groupBoxRule.Name = "groupBoxRule";
 			this.groupBoxRule.Size = new System.Drawing.Size(283, 231);
-			this.groupBoxRule.TabIndex = 4;
+			this.groupBoxRule.TabIndex = 3;
 			this.groupBoxRule.TabStop = false;
 			this.groupBoxRule.Text = "聊天过滤器";
 			// 
@@ -317,26 +339,6 @@ namespace FF14Chat.Controls {
 			this.textBoxRule.Enter += new System.EventHandler(this.textBoxRule_GotFocus);
 			this.textBoxRule.Leave += new System.EventHandler(this.textBoxRule_LostFocus);
 			// 
-			// buttonLogin
-			// 
-			this.buttonLogin.Location = new System.Drawing.Point(191, 28);
-			this.buttonLogin.Name = "buttonLogin";
-			this.buttonLogin.Size = new System.Drawing.Size(75, 23);
-			this.buttonLogin.TabIndex = 5;
-			this.buttonLogin.Text = "登录";
-			this.buttonLogin.UseVisualStyleBackColor = true;
-			this.buttonLogin.Click += new System.EventHandler(this.buttonLogin_Click);
-			// 
-			// buttonRegister
-			// 
-			this.buttonRegister.Location = new System.Drawing.Point(191, 71);
-			this.buttonRegister.Name = "buttonRegister";
-			this.buttonRegister.Size = new System.Drawing.Size(75, 23);
-			this.buttonRegister.TabIndex = 8;
-			this.buttonRegister.Text = "注册";
-			this.buttonRegister.UseVisualStyleBackColor = true;
-			this.buttonRegister.Click += new System.EventHandler(this.buttonRegister_Click);
-			// 
 			// groupboxUser
 			// 
 			this.groupboxUser.Controls.Add(this.groupBox1);
@@ -344,7 +346,7 @@ namespace FF14Chat.Controls {
 			this.groupboxUser.Location = new System.Drawing.Point(605, 14);
 			this.groupboxUser.Name = "groupboxUser";
 			this.groupboxUser.Size = new System.Drawing.Size(132, 462);
-			this.groupboxUser.TabIndex = 9;
+			this.groupboxUser.TabIndex = 5;
 			this.groupboxUser.TabStop = false;
 			this.groupboxUser.Text = "服务器当前用户";
 			// 
@@ -354,7 +356,7 @@ namespace FF14Chat.Controls {
 			this.groupBox1.Location = new System.Drawing.Point(149, 1);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(149, 462);
-			this.groupBox1.TabIndex = 10;
+			this.groupBox1.TabIndex = 0;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "服务器当前用户";
 			// 
@@ -397,7 +399,7 @@ namespace FF14Chat.Controls {
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
 			this.tabControl.Size = new System.Drawing.Size(304, 462);
-			this.tabControl.TabIndex = 0;
+			this.tabControl.TabIndex = 4;
 			this.tabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
 			// 
 			// tabPageRegion
@@ -414,6 +416,7 @@ namespace FF14Chat.Controls {
 			// dataGridMessage1
 			// 
 			this.dataGridMessage1.AllowUserToAddRows = false;
+			this.dataGridMessage1.AllowUserToDeleteRows = false;
 			this.dataGridMessage1.AllowUserToResizeColumns = false;
 			this.dataGridMessage1.AllowUserToResizeRows = false;
 			this.dataGridMessage1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
@@ -424,7 +427,7 @@ namespace FF14Chat.Controls {
 			this.dataGridMessage1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.dataGridViewTextBoxColumn11,
             this.dataGridViewTextBoxColumn12});
-			this.dataGridMessage1.Location = new System.Drawing.Point(-2, 3);
+			this.dataGridMessage1.Location = new System.Drawing.Point(0, 0);
 			this.dataGridMessage1.MultiSelect = false;
 			this.dataGridMessage1.Name = "dataGridMessage1";
 			this.dataGridMessage1.ReadOnly = true;
@@ -432,19 +435,27 @@ namespace FF14Chat.Controls {
 			this.dataGridMessage1.RowTemplate.Height = 17;
 			this.dataGridMessage1.RowTemplate.ReadOnly = true;
 			this.dataGridMessage1.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridMessage1.Size = new System.Drawing.Size(296, 436);
+			this.dataGridMessage1.Size = new System.Drawing.Size(293, 434);
 			this.dataGridMessage1.TabIndex = 0;
 			this.dataGridMessage1.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGrid1Message_CellMouseDown);
 			// 
 			// dataGridViewTextBoxColumn11
 			// 
+			this.dataGridViewTextBoxColumn11.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+			this.dataGridViewTextBoxColumn11.FillWeight = 50.56817F;
+			this.dataGridViewTextBoxColumn11.HeaderText = "dataGridViewTextBoxColumn11";
 			this.dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
 			this.dataGridViewTextBoxColumn11.ReadOnly = true;
+			this.dataGridViewTextBoxColumn11.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.dataGridViewTextBoxColumn11.Width = 70;
 			// 
 			// dataGridViewTextBoxColumn12
 			// 
+			this.dataGridViewTextBoxColumn12.FillWeight = 148.6704F;
+			this.dataGridViewTextBoxColumn12.HeaderText = "dataGridViewTextBoxColumn12";
 			this.dataGridViewTextBoxColumn12.Name = "dataGridViewTextBoxColumn12";
 			this.dataGridViewTextBoxColumn12.ReadOnly = true;
+			this.dataGridViewTextBoxColumn12.Resizable = System.Windows.Forms.DataGridViewTriState.False;
 			// 
 			// tabPageTeamUp
 			// 
@@ -468,6 +479,7 @@ namespace FF14Chat.Controls {
 			// dataGridMessage2
 			// 
 			this.dataGridMessage2.AllowUserToAddRows = false;
+			this.dataGridMessage2.AllowUserToDeleteRows = false;
 			this.dataGridMessage2.AllowUserToResizeColumns = false;
 			this.dataGridMessage2.AllowUserToResizeRows = false;
 			this.dataGridMessage2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
@@ -486,23 +498,32 @@ namespace FF14Chat.Controls {
 			this.dataGridMessage2.RowTemplate.Height = 17;
 			this.dataGridMessage2.RowTemplate.ReadOnly = true;
 			this.dataGridMessage2.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridMessage2.Size = new System.Drawing.Size(296, 436);
+			this.dataGridMessage2.Size = new System.Drawing.Size(293, 434);
 			this.dataGridMessage2.TabIndex = 0;
 			this.dataGridMessage2.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGrid2Message_CellMouseDown);
 			// 
 			// dataGridViewTextBoxColumn21
 			// 
+			this.dataGridViewTextBoxColumn21.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+			this.dataGridViewTextBoxColumn21.FillWeight = 76.14214F;
+			this.dataGridViewTextBoxColumn21.HeaderText = "";
 			this.dataGridViewTextBoxColumn21.Name = "dataGridViewTextBoxColumn21";
 			this.dataGridViewTextBoxColumn21.ReadOnly = true;
+			this.dataGridViewTextBoxColumn21.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.dataGridViewTextBoxColumn21.Width = 70;
 			// 
 			// dataGridViewTextBoxColumn22
 			// 
+			this.dataGridViewTextBoxColumn22.FillWeight = 123.8579F;
+			this.dataGridViewTextBoxColumn22.HeaderText = "";
 			this.dataGridViewTextBoxColumn22.Name = "dataGridViewTextBoxColumn22";
 			this.dataGridViewTextBoxColumn22.ReadOnly = true;
+			this.dataGridViewTextBoxColumn22.Resizable = System.Windows.Forms.DataGridViewTriState.False;
 			// 
 			// dataGridMessage3
 			// 
 			this.dataGridMessage3.AllowUserToAddRows = false;
+			this.dataGridMessage3.AllowUserToDeleteRows = false;
 			this.dataGridMessage3.AllowUserToResizeColumns = false;
 			this.dataGridMessage3.AllowUserToResizeRows = false;
 			this.dataGridMessage3.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
@@ -521,19 +542,27 @@ namespace FF14Chat.Controls {
 			this.dataGridMessage3.RowTemplate.Height = 17;
 			this.dataGridMessage3.RowTemplate.ReadOnly = true;
 			this.dataGridMessage3.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-			this.dataGridMessage3.Size = new System.Drawing.Size(296, 436);
+			this.dataGridMessage3.Size = new System.Drawing.Size(293, 434);
 			this.dataGridMessage3.TabIndex = 0;
 			this.dataGridMessage3.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGrid3Message_CellMouseDown);
 			// 
 			// dataGridViewTextBoxColumn31
 			// 
+			this.dataGridViewTextBoxColumn31.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+			this.dataGridViewTextBoxColumn31.FillWeight = 76.14214F;
+			this.dataGridViewTextBoxColumn31.HeaderText = "dataGridViewTextBoxColumn31";
 			this.dataGridViewTextBoxColumn31.Name = "dataGridViewTextBoxColumn31";
 			this.dataGridViewTextBoxColumn31.ReadOnly = true;
+			this.dataGridViewTextBoxColumn31.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+			this.dataGridViewTextBoxColumn31.Width = 70;
 			// 
 			// dataGridViewTextBoxColumn32
 			// 
+			this.dataGridViewTextBoxColumn32.FillWeight = 123.8579F;
+			this.dataGridViewTextBoxColumn32.HeaderText = "dataGridViewTextBoxColumn32";
 			this.dataGridViewTextBoxColumn32.Name = "dataGridViewTextBoxColumn32";
 			this.dataGridViewTextBoxColumn32.ReadOnly = true;
+			this.dataGridViewTextBoxColumn32.Resizable = System.Windows.Forms.DataGridViewTriState.False;
 			// 
 			// groupBoxBind
 			// 
@@ -546,7 +575,7 @@ namespace FF14Chat.Controls {
 			this.groupBoxBind.Location = new System.Drawing.Point(12, 159);
 			this.groupBoxBind.Name = "groupBoxBind";
 			this.groupBoxBind.Size = new System.Drawing.Size(283, 80);
-			this.groupBoxBind.TabIndex = 10;
+			this.groupBoxBind.TabIndex = 2;
 			this.groupBoxBind.TabStop = false;
 			this.groupBoxBind.Text = "通讯贝";
 			// 
@@ -558,7 +587,7 @@ namespace FF14Chat.Controls {
 			this.comboBox3.Location = new System.Drawing.Point(92, 57);
 			this.comboBox3.Name = "comboBox3";
 			this.comboBox3.Size = new System.Drawing.Size(121, 20);
-			this.comboBox3.TabIndex = 5;
+			this.comboBox3.TabIndex = 3;
 			this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.combobox3SelectedIndexChanged);
 			// 
 			// comboBox2
@@ -569,7 +598,7 @@ namespace FF14Chat.Controls {
 			this.comboBox2.Location = new System.Drawing.Point(92, 34);
 			this.comboBox2.Name = "comboBox2";
 			this.comboBox2.Size = new System.Drawing.Size(121, 20);
-			this.comboBox2.TabIndex = 4;
+			this.comboBox2.TabIndex = 2;
 			this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.combobox2SelectedIndexChanged);
 			// 
 			// comboBox1
@@ -580,7 +609,7 @@ namespace FF14Chat.Controls {
 			this.comboBox1.Location = new System.Drawing.Point(92, 9);
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(121, 20);
-			this.comboBox1.TabIndex = 3;
+			this.comboBox1.TabIndex = 1;
 			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.combobox1SelectedIndexChanged);
 			// 
 			// label4
@@ -589,7 +618,7 @@ namespace FF14Chat.Controls {
 			this.label4.Location = new System.Drawing.Point(33, 60);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(53, 12);
-			this.label4.TabIndex = 2;
+			this.label4.TabIndex = 0;
 			this.label4.Text = "交易频道";
 			// 
 			// label3
@@ -598,7 +627,7 @@ namespace FF14Chat.Controls {
 			this.label3.Location = new System.Drawing.Point(33, 37);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(53, 12);
-			this.label3.TabIndex = 1;
+			this.label3.TabIndex = 0;
 			this.label3.Text = "组队频道";
 			// 
 			// label2
@@ -617,7 +646,7 @@ namespace FF14Chat.Controls {
 			this.groupBoxBlanklist.Location = new System.Drawing.Point(743, 14);
 			this.groupBoxBlanklist.Name = "groupBoxBlanklist";
 			this.groupBoxBlanklist.Size = new System.Drawing.Size(132, 462);
-			this.groupBoxBlanklist.TabIndex = 11;
+			this.groupBoxBlanklist.TabIndex = 3;
 			this.groupBoxBlanklist.TabStop = false;
 			this.groupBoxBlanklist.Text = "黑名单";
 			// 
@@ -627,7 +656,7 @@ namespace FF14Chat.Controls {
 			this.groupBox3.Location = new System.Drawing.Point(149, 1);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(149, 462);
-			this.groupBox3.TabIndex = 10;
+			this.groupBox3.TabIndex = 1;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "黑名单";
 			// 
@@ -663,6 +692,8 @@ namespace FF14Chat.Controls {
 			// 
 			// dataGridBlacklist
 			// 
+			this.dataGridBlacklist.AllowUserToAddRows = false;
+			this.dataGridBlacklist.AllowUserToDeleteRows = false;
 			this.dataGridBlacklist.AllowUserToResizeColumns = false;
 			this.dataGridBlacklist.AllowUserToResizeRows = false;
 			dataGridViewCellStyle7.BackColor = System.Drawing.Color.LightGray;
@@ -770,10 +801,10 @@ namespace FF14Chat.Controls {
 			// 
 			this.Controls.Add(this.groupBoxBlanklist);
 			this.Controls.Add(this.groupBoxBind);
-			this.Controls.Add(this.tabControl);
 			this.Controls.Add(this.groupboxUser);
 			this.Controls.Add(this.groupBoxRule);
 			this.Controls.Add(this.groupBoxStatus);
+			this.Controls.Add(this.tabControl);
 			this.Name = "FF14ChatUi";
 			this.Size = new System.Drawing.Size(897, 480);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridUser)).EndInit();
@@ -833,14 +864,8 @@ namespace FF14Chat.Controls {
 		private TabControl tabControl;
 		private TabPage tabPageRegion;
 		private DataGridView dataGridMessage2;
-		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn21;
-		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn22;
 		private DataGridView dataGridMessage3;
-		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn31;
-		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn32;
 		private DataGridView dataGridMessage1;
-		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
-		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn12;
 		private TabPage tabPageTeamUp;
 		private TabPage tabPageTrade;
 		private GroupBox groupBoxBind;
@@ -869,5 +894,11 @@ namespace FF14Chat.Controls {
 		private ToolStripMenuItem ToolStripMenu_black2;
 		private ContextMenuStrip contextMenuMsg3;
 		private ToolStripMenuItem ToolStripMenu_black3;
+		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn21;
+		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn22;
+		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
+		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn12;
+		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn31;
+		private DataGridViewTextBoxColumn dataGridViewTextBoxColumn32;
 	}
 }

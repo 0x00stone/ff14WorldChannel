@@ -34,7 +34,7 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.checkBox2 = new System.Windows.Forms.CheckBox();
-			//this.button3 = new System.Windows.Forms.Button();
+			this.linkLabel1 = new System.Windows.Forms.LinkLabel();
 			this.SuspendLayout();
 			// 
 			// label2
@@ -54,7 +54,6 @@
 			this.button1.TabIndex = 5;
 			this.button1.Text = "登录";
 			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += loginButton_Click;
 			// 
 			// button2
 			// 
@@ -64,7 +63,6 @@
 			this.button2.TabIndex = 6;
 			this.button2.Text = "取消";
 			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Click += cancelButton_Click;
 			// 
 			// textBox1
 			// 
@@ -97,8 +95,6 @@
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(75, 20);
 			this.comboBox1.TabIndex = 3;
-			this.comboBox1.DropDown += ComboBox1_DropDown;
-			this.comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
 			// 
 			// comboBox2
 			// 
@@ -107,7 +103,6 @@
 			this.comboBox2.Name = "comboBox2";
 			this.comboBox2.Size = new System.Drawing.Size(75, 20);
 			this.comboBox2.TabIndex = 4;
-			this.comboBox2.DropDown += ComboBox2_DropDown;
 			// 
 			// label1
 			// 
@@ -138,22 +133,22 @@
 			this.checkBox2.Text = "自动登录";
 			this.checkBox2.UseVisualStyleBackColor = true;
 			// 
-			// button3
+			// linkLabel1
 			// 
-/*			this.button3.Location = new System.Drawing.Point(-1, 132);
-			this.button3.Name = "button3";
-			this.button3.Size = new System.Drawing.Size(75, 23);
-			this.button3.TabIndex = 10;
-			this.button3.Text = "button3";
-			this.button3.UseVisualStyleBackColor = true;
-			this.button3.Click += new System.EventHandler(this.button3_Click);*/
+			this.linkLabel1.AutoSize = true;
+			this.linkLabel1.Location = new System.Drawing.Point(12, 137);
+			this.linkLabel1.Name = "linkLabel1";
+			this.linkLabel1.Size = new System.Drawing.Size(53, 12);
+			this.linkLabel1.TabIndex = 10;
+			this.linkLabel1.TabStop = true;
+			this.linkLabel1.Text = "忘记密码";
 			// 
 			// LoginForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(292, 174);
-			//this.Controls.Add(this.button3);
+			this.Controls.Add(this.linkLabel1);
 			this.Controls.Add(this.checkBox2);
 			this.Controls.Add(this.checkBox1);
 			this.Controls.Add(this.label1);
@@ -184,6 +179,7 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.CheckBox checkBox1;
 		private System.Windows.Forms.CheckBox checkBox2;
+		private System.Windows.Forms.LinkLabel linkLabel1;
 		//private System.Windows.Forms.Button button3;
 	}
 }

@@ -212,9 +212,12 @@ namespace FF14Chat.Network {
 			return userResponse;
 		}
 
+		//不知道为什么有点问题，可能客户端时间比服务端时间快，data恒为[]
 		public static async Task<string> GetUsersByIncrement(LoginUserResult result) {
 			string userResponse = await NetworkUtil.SendGetRequest(getUsersAddress + result.getServerId() + "/" + timestamp);
+			
 			timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+
 			Log.info("GetUsersByIncrement ,time：" + timestamp);
 			return userResponse;
 		}
@@ -294,13 +297,14 @@ namespace FF14Chat.Network {
 		public static async Task<string> SendGetRequest(string url) {
 			if(httpClient == null)
 				httpClient = new HttpClient();
+			Log.track($"SendGetRequest - url:{url}");
 			Log.debug($"SendGetRequest - url:{url}");
 			try {
 				HttpResponseMessage response = await httpClient.GetAsync(url);
 				response.EnsureSuccessStatusCode();
 
 				string responseData = await response.Content.ReadAsStringAsync();
-
+				Log.track($"responseData - responseData:{responseData}");
 				return responseData;
 			} catch(Exception ex) {
 				Log.error($"SendGetRequest: {ex.Message}");

@@ -20,6 +20,9 @@ namespace FF14Chat.Controls {
 			this.main = main;
 			this.command = new Command();
 			InitializeComponent();
+			this.dataGridViewTextBoxColumn21.Width = 75;
+			this.dataGridViewTextBoxColumn31.Width = 75;
+
 			allGroupsUnVisiable();
 			setComboboxValue();
 			XmlUtils.LoadSysSettings(this);
@@ -303,12 +306,10 @@ namespace FF14Chat.Controls {
 				tabPageRegion.Controls.Add(dataGridMessage1);
 				tabPageTeamUp.Controls.Remove(dataGridMessage2);
 				tabPageTrade.Controls.Remove(dataGridMessage3);
-
 			} else if(tabControl.SelectedTab == tabPageTeamUp) {
 				tabPageRegion.Controls.Remove(dataGridMessage1);
 				tabPageTeamUp.Controls.Add(dataGridMessage2);
 				tabPageTrade.Controls.Remove(dataGridMessage3);
-
 			} else if(tabControl.SelectedTab == tabPageTrade) {
 				tabPageRegion.Controls.Remove(dataGridMessage1);
 				tabPageTeamUp.Controls.Remove(dataGridMessage2);
@@ -542,7 +543,6 @@ namespace FF14Chat.Controls {
 				result.setServerId(loginUser.ServerId);
 				result.setAliasName(loginUser.Name.Trim());
 				result.setPassword(loginUser.Password.Trim());
-				FF14Chat_Main.loginUserResult = result;
 				FF14Chat_Main.isLogin = true;
 			}
 
@@ -552,11 +552,13 @@ namespace FF14Chat.Controls {
 				MessageBox.Show("游戏帐户与聊天账户非绑定，请重新登录", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				main.restart();
 				return;
-			}
+			} else {
+				Log.info("autoLogin sucess");
+				allGroupsVisiable();
+				main.startServiceProcess();
+				FF14Chat_Main.loginUserResult = result;
 
-			Log.info("autoLogin sucess");
-			allGroupsVisiable();
-			main.startServiceProcess();
+			}
 		}
 
 		//注册界面
@@ -600,14 +602,23 @@ namespace FF14Chat.Controls {
 		}
 
 		public void allGroupsVisiable() {
-			this.tabControl.Visible = true;
-			this.groupBoxStatus.Visible = true;
-			this.groupBoxRule.Visible = true;
-			this.groupboxUser.Visible = true;
-			this.groupBoxBind.Visible = true;
-			this.buttonLogin.Visible = false;
-			this.buttonRegister.Visible = false;
-			this.groupBoxBlanklist.Visible = true;
+			if(!this.tabControl.Visible)
+				this.tabControl.Visible = true;
+			if(!this.groupBoxStatus.Visible)
+				this.groupBoxStatus.Visible = true;
+			if(!this.groupBoxRule.Visible)
+				this.groupBoxRule.Visible = true;
+
+			if(!this.groupboxUser.Visible)
+				this.groupboxUser.Visible = true;
+			if(!this.groupBoxBind.Visible)
+				this.groupBoxBind.Visible = true;
+			if(this.buttonLogin.Visible)
+				this.buttonLogin.Visible = false;
+			if(this.buttonRegister.Visible)
+				this.buttonRegister.Visible = false;
+			if(!this.groupBoxBlanklist.Visible)
+				this.groupBoxBlanklist.Visible = true;
 		}
 		#endregion
 
